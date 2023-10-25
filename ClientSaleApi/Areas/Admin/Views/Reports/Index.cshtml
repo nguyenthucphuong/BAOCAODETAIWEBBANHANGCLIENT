@@ -1,0 +1,204 @@
+﻿@model ClientSaleApi.Models.ViewModels.IndexViewModel<ReportEx>
+@using ClientSaleApi.Models.Reports;
+
+@{
+	ViewData["Title"] = "Index";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutDashboard.cshtml";
+	<partial name="_BootstrapTablePartial" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+}
+@section Search{
+	<form asp-area="Admin" asp-controller="Reports" asp-action="Index" report="search">
+		<input type="text" placeholder="Search..." class="form-control" name="search" style="color: white;">
+		<a href="#" onclick="this.closest('form').submit()">
+			<i class="fa fa-search"></i>
+		</a>
+	</form>
+}
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+	<partial name="_MessagePartial" model="@Model.Message" />
+}
+
+<div class="product-status mg-b-30">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="product-status-wrap">
+					<form id="exportForm" method="get" action="@Url.Action("ExportToExcel", "Reports")">
+						<input type="hidden" name="SkipCount" value="(@Model?.PagingModel?.Page - 1) * @Model?.PagingModel?.PageSize" />
+						<input type="hidden" name="MaxResultCount" value="@Model?.PagingModel?.PageSize" />
+						<input type="hidden" name="Search" value="@Model?.Search" />
+						<input type="hidden" name="page" value="@Model?.PagingModel?.Page" />
+						<div class="row">
+							<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+								<h4>Orders List</h4>
+							</div>
+							<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+								<div class="breadcomb-report">
+									<button type="submit" id="exportToExcel" data-toggle="tooltip" data-placement="left" title="" class="btn" data-original-title="Download Report"><i class="icon nalika-download"></i></button>
+								</div>
+							</div>
+						</div>
+						<table id="table" class="table" data-toggle="table" data-custom-sort="customSort">
+							@if (Model?.Items != null && Model.Items.Count == 0)
+							{
+								<caption class="text-center">
+									Không có dữ liệu
+								</caption>
+							}
+							<thead class="text-center">
+								<tr>
+									<th class="text-center" data-field="stt" data-sortable="true">STT</th>
+									<th class="text-center" data-field="ordername" data-sortable="true">OrderName</th>
+									<th class="text-center" data-field="username" data-sortable="true">User</th>
+									<th class="text-center" data-field="customer" data-sortable="true">Customer</th>
+									<th class="text-center" data-field="payment" data-sortable="true">Payment</th>
+									<th class="text-center" data-field="orderdatetime" data-sortable="true">OrderDatetime</th>
+									<th class="text-center" data-field="deliverydate" data-sortable="true">DeliveryDate</th>
+									<th class="text-center" data-field="orderstatus" data-sortable="true">OrderStatus</th>
+									<th class="text-center" data-field="total" data-sortable="true">Total</th>
+								</tr>
+							</thead>
+							<tbody>
+								@if (Model != null)
+								{
+									int count = (Model.Items!.PageNumber - 1) * Model.Items.PageSize + 1;
+									@foreach (var report in Model.Items)
+									{
+										<tr>
+											<td class="text-center">@count</td>
+											<td class="text-start">
+												<a href="#" class="open-modal" data-order-name="@report.OrderName"> @report.OrderName</a>
+											</td>
+											<td class="text-start">@report.UserName</td>
+											<td class="text-start">
+												@report.CustomerName<br>
+												@report.PhoneNumber
+											</td>
+											<td class="text-start">@report.PaymentName</td>
+											<td class="text-start">@report.OrderDatetime.ToString("dd/MM/yyyy HH:mm:ss")</td>
+											<td class="text-start">@report.DeliveryDate.ToString("dd/MM/yyyy")<br>@report.DeliveryTimeSlot</td>
+											<td class="text-center">
+												<select class="form-control text-white orderStatusSelect" data-order-name="@report.OrderName" name="orderStatusName">
+													@foreach (var status in @report.ListOrderStatusNames)
+													{
+														if (status == report.OrderStatusName)
+														{
+															<option value="@status" selected>@status</option>
+														}
+														else
+														{
+															<option value="@status">@status</option>
+														}
+													}
+												</select>
+												<input type="hidden" name="orderName" value="@report.OrderName" />
+											</td>
+											@if (report.Refund > 0)
+											{
+												<td class="text-start">-@report.Total.ToString("N0")</td>
+											}
+											else
+											{
+												<td class="text-start">@report.Total.ToString("N0")</td>
+											}
+										</tr>
+										count++;
+									}
+								}
+							</tbody>
+						</table>
+						<partial name="_Paging" model="@Model?.PagingModel" />
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="orderItemListModal" tabindex="-1" role="dialog" aria-labelledby="orderItemListModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Chi tiết đơn hàng <strong id="orderName"></strong></h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- Hiển thị partial _OrderItemList -->
+			<div class="modal-body" id="orderItemListContainer">
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function () {
+		$(".orderStatusSelect").each(function () {
+			var selectedIndex = $(this).prop('selectedIndex');
+
+			// Thêm thuộc tính disabled vào các option đã được chọn
+			$(this).find('option').each(function (index, option) {
+				if (index <= selectedIndex) {
+					$(option).prop('disabled', true);
+				}
+			});
+
+			var colors = ["bg-primary", "bg-info", "bg-success", "bg-dark"];
+			$(this).removeClass(...colors);
+			$(this).addClass(colors[selectedIndex % colors.length]);
+		});
+
+		$(".orderStatusSelect").change(function () {
+			var orderName = $(this).data('order-name');
+			var orderStatusName = $(this).val();
+			var selectedIndex = $(this).prop('selectedIndex');
+
+			// Thêm thuộc tính disabled vào các option đã được chọn
+			$(this).find('option').each(function (index, option) {
+				if (index <= selectedIndex) {
+					$(option).prop('disabled', true);
+				}
+			});
+
+			$.ajax({
+				url: '/bao-cao/cap-nhat-trang-thai-don-hang',
+				type: 'PUT',
+				contentType: 'application/json',
+				data: JSON.stringify({ orderName: orderName, orderStatusName: orderStatusName }),
+				success: function (response) {
+					location.reload();
+					console.log(response);
+				}
+			});
+
+			var colors = ["bg-primary", "bg-info", "bg-success", "bg-dark"];
+			$(this).removeClass(...colors);
+			$(this).addClass(colors[selectedIndex % colors.length]);
+		});
+
+		$('.open-modal').click(function (e) {
+			e.preventDefault();
+			var orderName = $(this).data('order-name');
+			$.get("/gio-hang/chi-tiet-don-hang", { orderName: orderName }, function (html) {
+				$('#orderItemListContainer').html(html);
+				$("#orderName").text(orderName).addClass('text-primary');
+				$('#orderItemListModal').modal('show');
+			});
+		});
+	});
+
+	// Nhấn icon Export
+	document.getElementById("exportToExcel").addEventListener("click", function () {
+		window.location.href = "@Url.Action("ExportToExcel", "Reports")";
+	});
+
+</script>
+
+
+
+

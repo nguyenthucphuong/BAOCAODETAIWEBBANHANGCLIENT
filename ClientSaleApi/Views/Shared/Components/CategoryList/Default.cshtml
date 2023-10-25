@@ -1,0 +1,7 @@
+﻿@using ClientSaleApi.Models.Categories
+@model List<CategoryEx>
+
+@foreach (var category in Model)
+{
+    <a asp-area="" asp-controller="Shops" asp-action="Index" asp-route-categoryname="@category.CategoryName" class="nav-item nav-link">@category.CategoryName</a>
+}

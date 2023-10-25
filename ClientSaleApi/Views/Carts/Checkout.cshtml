@@ -1,0 +1,458 @@
+﻿@model ClientSaleApi.Models.Carts.CheckoutModel
+@{
+	ViewData["Title"] = "Checkout";
+	Layout = "~/Views/Shared/_LayoutMultishop.cshtml";
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	long subTotal = 0;
+	long subTotalDiscount = 0;
+	long toTal = 0;
+	int discountCode = 0;
+}
+<!-- Breadcrumb Start -->
+<div class="container-fluid">
+	<div class="row px-xl-5">
+		<div class="col-12">
+			<nav class="breadcrumb bg-light mb-30">
+				<a class="breadcrumb-item text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+				<span class="breadcrumb-item active">Checkout</span>
+			</nav>
+		</div>
+	</div>
+</div>
+<!-- Breadcrumb End -->
+<!-- Checkout Start -->
+<form id="place-order-form" asp-area="" asp-controller="Carts" asp-action="PlaceOrder" method="post" style="width: 100%;">
+	<div class="container-fluid">
+		<div class="row px-xl-5">
+			<div class="col-lg-4">
+				<h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Billing Address</span></h5>
+				<div class="bg-light p-30 mb-5">
+					<div class="row">
+						<div class="col-md-7 p-1">
+							<div class="form-group">
+								<label>Họ và Tên</label><span class="text-danger ml-1">(*)</span>
+								<input type="text" name="InputCustomer.CustomerName" value="@Model.Customer?.CustomerName" class="form-control" minlength="1" maxlength="50" required>
+							</div>
+						</div>
+						<div class="col-md-5 p-1">
+							<div class="form-group">
+								<label>Điện thoại</label><span class="text-danger ml-1">(*)</span>
+								<input class="form-control text-center" type="tel" name="InputCustomer.PhoneNumber" value="@Model.Customer?.PhoneNumber" pattern="[0-9]{10}" required>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-7 p-1">
+							<div class="form-group">
+								<label>Thành phố/Tỉnh</label><span class="text-danger ml-1">(*)</span>
+								<select class="custom-select" id="city" aria-label=".form-select-sm">
+									<option value="" selected>@(Model.Customer?.City ?? "")</option>
+								</select>
+								<input type="hidden" name="InputCustomer.City" id="cityName" value="@(Model.Customer?.City ?? "")">
+							</div>
+						</div>
+						<div class="col-md-5 p-1">
+							<div class="form-group">
+								<label>Quận/Huyện</label><span class="text-danger ml-1">(*)</span>
+								<select class="custom-select" id="district" aria-label=".form-select-sm">
+									<option value="" selected>@(Model.Customer?.District ?? "")</option>
+								</select>
+								<input type="hidden" name="InputCustomer.District" id="districtName" value="@(Model.Customer?.District ?? "")">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6 p-1">
+							<div class="form-group">
+								<label>Phường/Xã</label><span class="text-danger ml-1">(*)</span>
+								<select class="custom-select" id="ward" aria-label=".form-select-sm">
+									<option value="" selected>@(Model.Customer?.Ward ?? "")</option>
+								</select>
+								<input type="hidden" name="InputCustomer.Ward" id="wardName" value="@(Model.Customer?.Ward ?? "")">
+							</div>
+						</div>
+						<div class="col-md-6 p-1">
+							<div class="form-group">
+								<label>Địa chỉ</label><span class="text-danger ml-1">(*)</span>
+								<input class="form-control" type="text" name="InputCustomer.Address" value="@Model.Customer?.Address" minlength="1" maxlength="50" required>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6 p-1">
+							<div class="form-group">
+								<label>Ngày nhận hàng</label>
+								<input class="form-control text-center" type="date" name="InputOrder.DeliveryDate" placeholder="dd-mm-yyyy" min="@(DateTime.Now.ToString("yyyy-MM-dd"))">
+							</div>
+						</div>
+						<div class="col-md-6 p-1">
+							<div class="form-group">
+								<label>Chọn Giờ nhận hàng</label>
+								<select class="custom-select text-center" name="InputOrder.DeliveryTimeSlot" id="deliverytimeslot" aria-label=".form-select-sm">
+									<option value=""></option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12 p-0">
+						<div id="ghichu-container" class="control-group" style="display:none">
+							<label>Ghi chú</label>
+							<textarea name="InputOrder.GhiChu" class="form-control" id="ghichu" placeholder="Nhập thông tin bổ sung" aria-describedby="text"></textarea>
+							<p class="help-block text-danger"></p>
+						</div>
+					</div>
+					<div class="col-md-12 p-0">
+						<div class="control-group">
+							<p class="help-block text-danger">(*): Thông tin bắt buộc</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-8">
+				<h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Order Total</span></h5>
+				<div class="bg-light p-30 mb-2 m-0">
+					@if (Model != null)
+					{
+						@await Html.PartialAsync("_CartList", Model.Cart)
+						<div class="border-bottom border-top pt-1 pb-0">
+							<div class="d-flex justify-content-between mb-0">
+								@{
+									int index = 0;
+									foreach (var item in Model.Cart.Items)
+									{
+										subTotal += item.ProductPrice * item.Quantity;
+										subTotalDiscount += (item.ProductPrice * item.Quantity * (item.Discount ?? 0)) / 100;
+										<input type="hidden" name="InputOrderItems[@index].ProductName" value="@item.ProductName">
+										<input type="hidden" name="InputOrderItems[@index].Quantity" value="@item.Quantity">
+										<input type="hidden" name="InputOrderItems[@index].Price" value="@item.ProductPrice">
+										index++;
+									}
+									toTal = subTotal - subTotalDiscount;
+								}
+								<h6>Subtotal</h6>
+								<h6 id="subtotalValue">@subTotal.ToString("N0")</h6>
+							</div>
+						</div>
+						@if (subTotalDiscount > 0)
+						{
+							<div class="border-bottom pt-0 pb-0">
+								<div class="d-flex justify-content-between mb-0">
+
+									<h6>Subtotal Discount</h6>
+									<h6 id="subtotalDiscountValue">-@subTotalDiscount.ToString("N0")</h6>
+								</div>
+							</div>
+						}
+						<div class="pt-0">
+							<div class="d-flex border-bottom justify-content-between mt-0">
+								<h5>Total</h5>
+								<h5 id="total">@toTal.ToString("N0")</h5>
+								<input id="inputtotal" type="hidden" name="InputOrder.Total" value="@toTal">
+							</div>
+						</div>
+						<div id="discountCodeContainer" class="border-bottom pt-0 pb-0 mark" style="display:none">
+							<div class="d-flex justify-content-between mb-0">
+								<h6>Coupon Discount</h6>
+								<h6 id="discount">@discountCode.ToString("N0")</h6>
+								<input type="hidden" name="InputOrder.DiscountCode" value="@discountCode">
+							</div>
+						</div>
+						<div id="totalcouponContainer" class="pt-0 mark" style="display:none">
+							<div class="d-flex justify-content-between mt-0">
+								<h5>Total Coupon</h5>
+								<h5 id="totalcoupon">@toTal.ToString("N0")</h5>
+								<input id="inputtotalcoupon" type="hidden" name="InputOrder.Total" value="@toTal">
+							</div>
+						</div>
+					}
+				</div>
+				<div class="mb-5">
+					<h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Payment</span></h5>
+					<div class="bg-light p-30">
+						<!-- Radio buttons (3 in a row) -->
+						<div class="row justify-content-center align-items-center mb-3">
+							<div class="col-md-4">
+								<div class="form-group d-flex align-items-center">
+									<div class="custom-control custom-radio">
+										<input type="radio" class="custom-control-input" name="InputOrder.PaymentName" id="nganhang" value="Chuyển khoản ngân hàng">
+										<label class="custom-control-label" for="nganhang">Chuyển khoản ngân hàng</label>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group d-flex align-items-center">
+									<div class="custom-control custom-radio mx-auto">
+										<input type="radio" class="custom-control-input" name="InputOrder.PaymentName" id="tindung" value="Thanh toán thẻ tín dụng">
+										<label class="custom-control-label" for="tindung">Thanh toán thẻ tín dụng</label>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group d-flex align-items-center">
+									<div class="custom-control custom-radio ml-auto">
+										<input type="radio" class="custom-control-input" name="InputOrder.PaymentName" id="nhanhang" value="Thanh toán khi nhận hàng" checked>
+										<label class="custom-control-label" for="nhanhang">Thanh toán khi nhận hàng</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row justify-content-center align-items-center">
+							<div class="col-md-6">
+								<div class="form-group input-group border border-warning">
+									<input type="text" id="coupon-code" class="form-control border-0 p-4 text-uppercase" placeholder="Coupon Code">
+									<input type="hidden" id="totalAmount" value="@toTal">
+									<div class="input-group-append">
+										<button id="apply-coupon" class="btn btn-lg btn-block btn-primary font-weight-bold py-3">APPLY COUPON</button>
+										<input type="hidden" id="promotion-name" name="InputOrder.PromotionName">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group input-group d-flex flex-column justify-content-center align-items-center">
+									<div class="input-group-append">
+										<button type="button" class="btn btn-lg btn-block btn-primary font-weight-bold py-3" data-toggle="modal" data-target="#staticBackdrop">PLACE ORDER</button>
+										<button type="submit" id="submitOrderButton" style="display: none;"></button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+<!-- Checkout End -->
+<!-- Modal Coupon-->
+<div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-warning bg-opacity-50">
+				<h5 class="modal-title text-white" id="couponModalLabel">Thông báo</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body text-dark">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary bg-warning" data-dismiss="modal">Đóng</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Confirm-->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="staticBackdropLabel">Xác nhận hoàn tất đơn hàng</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				Bạn chắc chắn đã kiểm tra thông tin đơn hàng chính xác?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+				<button type="button" class="btn btn-primary" id="confirmOrder" onclick="document.getElementById('submitOrderButton').click();">Xác nhận</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function () {
+
+		// <----------------- Chỉnh chiều cao động cho ô Ghi chú ----------------->
+		var textarea = $('#ghichu');
+		var deliveryTimeSlot = $('#deliverytimeslot');
+		var ghichuContainer = $('#ghichu-container');
+		deliveryTimeSlot.on('focus', function () {
+			ghichuContainer.show();
+		});
+		textarea.on('input', function () {
+			this.style.height = 'auto';
+			this.style.height = (this.scrollHeight) + 'px';
+		});
+
+		// <----------------- Tìm giá trị và tính toán dựa vào tên Coupon ----------------->
+
+		$('#apply-coupon').click(function (event) {
+			event.preventDefault();
+			var promotionName = $('#coupon-code').val();
+			var total = $('#totalAmount').val();
+
+			$.ajax({
+				url: `/gio-hang/discount?promotionName=${promotionName}`,
+				type: 'GET',
+				success: function (outputDiscount) {
+					if (outputDiscount.success) {
+						var discount = outputDiscount.discount;
+						var discountCode = parseInt(total * discount / 100);
+						const max = 100000;
+						if (discountCode <= max) {
+							$('#couponModal .modal-body').html(`Coupon <strong>${promotionName.toUpperCase()}</strong> <strong>${discount}%</strong> được giảm <strong>${discountCode.toLocaleString()}</strong> cho đơn hàng <strong>${parseInt(total).toLocaleString()}</strong>`);
+							$('#couponModal').modal('show');
+						} else {
+							discountCode = max;
+							$('#couponModal .modal-body').html(`Coupon <strong>${promotionName.toUpperCase()}</strong> <strong>${discount}%</strong> được giảm tối đa <strong>${max.toLocaleString()}</strong> cho đơn hàng <strong>${parseInt(total).toLocaleString()}</strong>`);
+							$('#couponModal').modal('show');
+						}
+
+						if (!isNaN(discountCode)) {
+							$('#discount').text('-' + discountCode.toLocaleString());
+							$('input[name="InputOrder.DiscountCode"]').val(discountCode);
+						}
+						// Tính toán lại giá trị của toTal
+						var subTotal = parseInt($('#subtotalValue').text().replace(/,/g, ''));
+						var subTotalDiscount = parseInt($('#subtotalDiscountValue').text().replace(/,/g, ''));
+						if (isNaN(subTotalDiscount)) {
+							var totalCoupon = subTotal - discountCode;
+							$('#totalcoupon').text(totalCoupon.toLocaleString());
+							$('input[name="InputOrder.Total"]').val(totalCoupon);
+						} else if (!isNaN(subTotal) && !isNaN(discountCode)) {
+							var totalCoupon = subTotal + subTotalDiscount - discountCode;
+							$('#totalcoupon').text(totalCoupon.toLocaleString());
+							$('input[name="InputOrder.Total"]').val(totalCoupon);
+						}
+
+						// Kiểm tra giá trị của discountCode và ẩn hoặc hiển thị đoạn mã HTML tương ứng
+						if (discountCode == 0) {
+							$('#discountCodeContainer').hide();
+							$('#totalcouponContainer').hide();
+							$('input[name="InputOrder.Total"]').val(total);
+						} else {
+							$('#discountCodeContainer h6:first').text('Coupon ' + promotionName.toUpperCase() + ' ( -' + discount.toString() + '%)');
+							$('#discountCodeContainer').show();
+							$('#totalcouponContainer').show();
+							$('input[name="InputOrder.Total"]').val(totalCoupon);
+						}
+						// Cập nhật giá trị của thẻ input ẩn chứa giá trị PromotionName
+						$('input[name="InputOrder.PromotionName"]').val(promotionName.toUpperCase());
+					} else {
+						$('#couponModal .modal-body').text(outputDiscount.message);
+						$('#couponModal').modal('show');
+					}
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log('Error calling api:', textStatus, errorThrown);
+				}
+			});
+		});
+	});
+
+	// <----------------- Chọn thông tin địa chỉ trên toàn quốc ----------------->
+	var citis = document.getElementById("city");
+	var districts = document.getElementById("district");
+	var wards = document.getElementById("ward");
+	var cityName = document.getElementById("cityName");
+	var districtName = document.getElementById("districtName");
+	var wardName = document.getElementById("wardName");
+
+	var Parameter = {
+		url: "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json",
+		method: "GET",
+		responseType: "application/json",
+	};
+
+	var promise = axios(Parameter);
+	promise.then(function (result) {
+		renderCity(result.data);
+	});
+
+	function renderCity(data) {
+		for (const x of data) {
+			citis.options[citis.options.length] = new Option(x.Name, x.Name);
+		}
+		citis.onchange = function () {
+			district.length = 1;
+			ward.length = 1;
+			if (this.value != "") {
+				const result = data.filter(n => n.Name === this.value);
+				cityName.value = result[0].Name;
+				for (const k of result[0].Districts) {
+					district.options[district.options.length] = new Option(k.Name, k.Name);
+				}
+			}
+		};
+
+		district.onchange = function () {
+			ward.length = 1;
+			const dataCity = data.filter((n) => n.Name === citis.value);
+			if (this.value != "") {
+				const dataDistricts = dataCity[0].Districts.filter(n => n.Name === this.value);
+				districtName.value = dataDistricts[0].Name;
+				const dataWards = dataDistricts[0].Wards;
+				for (const w of dataWards) {
+					wards.options[wards.options.length] = new Option(w.Name, w.Name);
+				}
+			}
+		};
+
+		ward.onchange = function () {
+			if (this.value != "") {
+				const dataCity = data.filter((n) => n.Name === citis.value);
+				const dataDistricts = dataCity[0].Districts.filter(n => n.Name === district.value);
+				const dataWards = dataDistricts[0].Wards.filter(n => n.Name === this.value);
+				wardName.value = dataWards[0].Name;
+			}
+		};
+	}
+
+	// <----------------- Ẩn khung giờ trước giờ hiện tại ----------------->
+	var today = new Date();
+	var dd = String(today.getDate()).padStart(2, '0');
+	var mm = String(today.getMonth() + 1).padStart(2, '0'); // Tháng trong JavaScript bắt đầu từ 0 nên phải +1
+	var yyyy = today.getFullYear();
+	today = yyyy + '-' + mm + '-' + dd;
+
+	// Lấy giờ hiện tại và tăng lên 1 để lấy khung giờ tiếp theo
+	var currentHour = new Date().getHours();
+	var nextHour = currentHour + 1;
+
+	// Nếu giờ tiếp theo lớn hơn 20, đặt nó thành 8 và tăng ngày lên 1
+	if (nextHour > 20) {
+		nextHour = 8;
+		var tomorrow = new Date(today);
+		tomorrow.setDate(tomorrow.getDate() + 1);
+		dd = String(tomorrow.getDate()).padStart(2, '0');
+		mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+		yyyy = tomorrow.getFullYear();
+		today = yyyy + '-' + mm + '-' + dd;
+	}
+
+	// Đặt ngày hiện tại hoặc ngày tiếp theo (nếu sau 20:00) làm giá trị mặc định
+	$('input[type="date"]').val(today);
+	$('input[type="date"]').attr('min', today);
+	nextHour = zeroFill(nextHour, 2);
+	var timeSlotNextHour = nextHour + ":00 - " + zeroFill(parseInt(nextHour) + 1, 2) + ":00";
+
+	// Tạo danh sách lựa chọn khung giờ
+	var selection = "";
+	for (var i = 8; i < 21; i++) {
+		var j = zeroFill(i, 2);
+		var k = zeroFill(i + 1, 2);
+		var timeSlot = j + ":00 - " + k + ":00";
+		if (i < nextHour) {
+			selection += "<option value='" + timeSlot + "' disabled>" + timeSlot + "</option>";
+		} else if (i == nextHour) {
+			selection += "<option value='" + timeSlotNextHour + "' selected>" + timeSlotNextHour + "</option>";
+		} else {
+			selection += "<option value='" + timeSlot + "'>" + timeSlot + "</option>";
+		}
+	}
+	$("#deliverytimeslot").html(selection);
+
+	function zeroFill(number, width) {
+		width -= number.toString().length;
+		if (width > 0) {
+			return new Array(width + (/\./.test(number) ? 2 : 1)).join('0') + number;
+		}
+		return number + ""; // always return a string
+	}
+
+</script>

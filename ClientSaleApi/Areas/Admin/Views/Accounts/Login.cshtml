@@ -1,0 +1,37 @@
+﻿@model ClientSaleApi.Models.Accounts.InputLogin
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAccount.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"></div>
+        <div class="col-md-4 col-md-4 col-sm-4 col-xs-12">
+            <div class="text-center m-b-md custom-login" style="color: white;">
+                <h3>PLEASE LOGIN TO WEBSITE</h3>
+            </div>
+            <div class="hpanel">
+                <div class="panel-body">
+                    <form id="loginForm" asp-area="Admin" asp-controller="Accounts" asp-action="Login" method="post">
+                        <div class="form-group">
+                            <label asp-for="Email"></label>
+                            <input asp-for="Email" class="form-control" placeholder="example@gmail.com" onkeyup="this.value = this.value.toLowerCase();" required>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Password"></label>
+                            <input asp-for="Password" class="form-control" placeholder="Độ dài từ 6 - 50 kí tự" required>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block loginbtn">Login</button>
+                        <a class="btn btn-custon-four btn-success btn-block" asp-area="Admin" asp-controller="Accounts" asp-action="Register">Register</a>
+                        <a class="btn btn-custon-four btn-warning btn-block" asp-area="Admin" asp-controller="Accounts" asp-action="CheckEmail">Forgot password?</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"></div>
+    </div>
+</div>
+

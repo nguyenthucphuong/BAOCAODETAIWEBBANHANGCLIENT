@@ -1,0 +1,320 @@
+﻿@model ClientSaleApi.Models.Orders.OrderResponse
+@using Newtonsoft.Json
+@{
+	ViewData["Title"] = "HistoryOrder";
+	Layout = "~/Views/Shared/_LayoutMultishop.cshtml";
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+}
+
+<!-- Breadcrumb Start -->
+<div class="container-fluid">
+	<div class="row px-xl-5">
+		<div class="col-12">
+			<nav class="breadcrumb bg-light mb-30">
+				<a class="breadcrumb-item text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+				<a class="breadcrumb-item text-dark" asp-area="" asp-controller="Shop" asp-action="Index">Shop</a>
+				<span class="breadcrumb-item active">Checkout</span>
+			</nav>
+		</div>
+	</div>
+</div>
+<!-- Breadcrumb End -->
+<!-- Checkout Start -->
+
+<div class="container-fluid">
+	<div class="row px-xl-5">
+		<div class="col-lg-4">
+			<h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Ordered Lists</span></h5>
+			<div class="bg-light p-30 mb-1">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<label>Danh sách đơn hàng</label>
+							<select id="order-select" class="form-select" multiple aria-label="multiple select example" style="width: 100%;" size="@(Model.Orders.Items.Count > 10 ? 10 : Model.Orders.Items.Count)">
+								@foreach (var order in Model.Orders.Items)
+								{
+									<option value="@order.OrderName">@order.OrderName</option>
+								}
+							</select>
+						</div>
+						<div class="col">
+							<div class="form-group">
+								<label>Ngày mua hàng</label>
+								<input type="datetime-local" id="orderdatetime" value="" class="form-control text-dark font-weight-bold text-center" readonly>
+							</div>
+						</div>
+						<div class="col-6 form-group">
+							<label>Ngày nhận hàng</label>
+							<input type="date" value="" id="deliverydate" class="form-control text-dark font-weight-bold text-center" readonly>
+						</div>
+						<div class="col-6 form-group">
+							<label>Giờ nhận hàng</label>
+							<div id="deliverytimeslot" class="form-control text-dark font-weight-bold text-center"></div>
+						</div>
+						<div class="col">
+							<div class="form-group" id="ghichu-container" style="display:none">
+								<label>Ghi chú</label>
+								<textarea name="ghiChu" class="form-control" id="ghichu" value="" aria-describedby="text" readonly></textarea>
+								<p class="help-block text-danger"></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-8">
+			<h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Order Total</span></h5>
+			<div class="bg-light p-30 mb-3">
+				@if (Model != null)
+				{
+					<div id="order-items-container"></div>
+					@section Scripts {
+					<script>
+						$(document).ready(function () {
+							$("#order-select").change(function () {
+								var orderName = $(this).val();
+								$.get("/gio-hang/thong-tin-don-hang?orderName=" + orderName, function (data) {
+									$.get("/gio-hang/chi-tiet-don-hang?orderName=" + orderName, function (data) {
+										$("#order-items-container").html(data);
+									});
+									$("#paymentname").text(data.paymentName);
+									$("#paymentname").css("cssText", "color: " + data.textColorPaymentName + " !important;");
+									$("#paymentname").css("background-color", data.backgroundColorPaymentName);
+									$("#orderstatusname").text(data.orderStatusName);
+									$("#orderstatusname").css("cssText", "color: " + data.textColorOrderStatusName + " !important;");
+									$("#orderstatusname").css("background-color", data.backgroundColorOrderStatusName);
+									$("#ghichu").text(data.ghiChu);
+									$("#orderdatetime").val(data.orderDatetime.substring(0, 19));
+									$("#deliverydate").val(data.deliveryDate.substring(0, 10));
+									$("#deliverytimeslot").text(data.deliveryTimeSlot);
+
+									if (!data.ghiChu) {
+										$("#ghichu-container").hide();
+									} else {
+										$("#ghichu-container").show();
+									}
+
+									if (!data.promotionName) {
+										$("#coupon-code").text('NO COUPON');
+									} else {
+										$("#coupon-code").text(data.promotionName);
+									}
+								});
+							});
+							// Kích hoạt sự kiện change cho phần tử đầu tiên
+							$('#order-select').prop('selectedIndex', 0).trigger('change');
+						});
+					</script>
+				}
+				}
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Payment</span></h5>
+					<div class="bg-light p-30">
+						<div id="paymentname" value="" class="btn btn-block btn-primary font-weight-bold py-3"></div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Status</span></h5>
+					<div class="bg-light p-30">
+						<div id="orderstatusname" value="" class="btn btn-block btn-primary font-weight-bold py-3">
+						</div>
+					</div>
+				</div>
+				<div id="coupon-container" class="col-md-4">
+					<h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Coupon</span></h5>
+					<div class="bg-light p-30">
+						<div id="coupon-code" class="btn btn-block btn-primary font-weight-bold py-3" value="NO COUPON"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="message-modal">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-warning p-2 bg-opacity-25">
+				<h4 class="modal-title text-white">Thông báo</h4>
+			</div>
+			<div class="modal-body text-center" style="font-size: 20px;">
+				<p id="message-content" class="font-weight-bold" style="-webkit-text-stroke: 1px black;text-align: center; font-size: 30px;"></p>
+			</div>
+		</div>
+	</div>
+	<canvas class="confetti" id="canvas" style="max-width: 100%; display: block; margin: 0 auto; user-select: none; position: absolute; top: 0; left: 0; z-index: 1;"></canvas>
+</div>
+
+<script>
+	// Chỉnh chiều cao động cho ô Ghi chú
+	$(document).ready(function () {
+		var textarea = $('#ghichu');
+		textarea.on('input', function () {
+			this.style.height = 'auto';
+			this.style.height = (this.scrollHeight) + 'px';
+		});
+	});
+	// Hiển thị thông báo đổi màu chữ
+	var message = '@(Model != null ? Html.Raw(JsonConvert.SerializeObject(Model.Message)) : "")';
+	$(document).ready(function () {
+		if (message && message !== 'null' && message.trim() !== '') {
+			message = message.replace(/"/g, '');
+			showModalAndAnimate(message);
+		}
+	});
+	function showModalAndAnimate(message) {
+		$("#message-content").text(message);
+		$("#message-modal").modal('show');
+
+		var messageContent = document.getElementById("message-content");
+		var interval;
+
+		function changeTextColor() {
+			var randomColor = getRandomColor();
+			messageContent.style.color = randomColor;
+		}
+
+		interval = setInterval(changeTextColor, 500);
+
+		setTimeout(function () {
+			clearInterval(interval);
+			messageContent.style.color = "red"; // Đặt màu chữ về mặc định
+			$("#message-modal").modal('hide');
+		}, 4500);
+	}
+
+	function getRandomColor() {
+		var letters = '0123456789ABCDEF';
+		var color = '#';
+		for (var i = 0; i < 6; i++) {
+			color += letters[Math.floor(Math.random() * 16)];
+		}
+		return color;
+	}
+
+	function showModal(message) {
+		$('#modalMessage').text(message);
+		$('#myModal').modal('show');
+	}
+
+	// ------------------------ Tạo hiệu ứng ------------------------
+	canvas = document.getElementById("canvas");
+	ctx = canvas.getContext("2d");
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	cx = ctx.canvas.width / 2;
+	cy = ctx.canvas.height / 2;
+
+	let confetti = [];
+	const confettiCount = 300;
+	const gravity = 0.5;
+	const terminalVelocity = 5;
+	const drag = 0.075;
+	const colors = [
+		{ front: 'red', back: 'darkred' },
+		{ front: 'green', back: 'darkgreen' },
+		{ front: 'blue', back: 'darkblue' },
+		{ front: 'yellow', back: 'darkyellow' },
+		{ front: 'orange', back: 'darkorange' },
+		{ front: 'pink', back: 'darkpink' },
+		{ front: 'purple', back: 'darkpurple' },
+		{ front: 'turquoise', back: 'darkturquoise' }];
+
+	resizeCanvas = () => {
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+		cx = ctx.canvas.width / 2;
+		cy = ctx.canvas.height / 2;
+	};
+	randomRange = (min, max) => Math.random() * (max - min) + min;
+	initConfetti = () => {
+		for (let i = 0; i < confettiCount; i++) {
+			confetti.push({
+				color: colors[Math.floor(randomRange(0, colors.length))],
+				dimensions: {
+					x: randomRange(10, 20),
+					y: randomRange(10, 30)
+				},
+
+				position: {
+					x: randomRange(0, canvas.width),
+					y: canvas.height - 1
+				},
+
+				rotation: randomRange(0, 2 * Math.PI),
+				scale: {
+					x: 1,
+					y: 1
+				},
+
+				velocity: {
+					x: randomRange(-25, 25),
+					y: randomRange(0, -50)
+				}
+			});
+		}
+	};
+
+	render = () => {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		confetti.forEach((confetto, index) => {
+			let width = confetto.dimensions.x * confetto.scale.x;
+			let height = confetto.dimensions.y * confetto.scale.y;
+
+			// Move canvas to position and rotate
+			ctx.translate(confetto.position.x, confetto.position.y);
+			ctx.rotate(confetto.rotation);
+
+			// Apply forces to velocity
+			confetto.velocity.x -= confetto.velocity.x * drag;
+			confetto.velocity.y = Math.min(confetto.velocity.y + gravity, terminalVelocity);
+			confetto.velocity.x += Math.random() > 0.5 ? Math.random() : -Math.random();
+
+			// Set position
+			confetto.position.x += confetto.velocity.x;
+			confetto.position.y += confetto.velocity.y;
+
+			// Delete confetti when out of frame
+			if (confetto.position.y >= canvas.height) confetti.splice(index, 1);
+
+			// Loop confetto x position
+			if (confetto.position.x > canvas.width) confetto.position.x = 0;
+			if (confetto.position.x < 0) confetto.position.x = canvas.width;
+
+			// Spin confetto by scaling y
+			confetto.scale.y = Math.cos(confetto.position.y * 0.1);
+			ctx.fillStyle = confetto.scale.y > 0 ? confetto.color.front : confetto.color.back;
+
+			// Draw confetti
+			ctx.fillRect(-width / 2, -height / 2, width, height);
+
+			// Reset transform matrix
+			ctx.setTransform(1, 0, 0, 1, 0, 0);
+		});
+
+		// Fire off another round of confetti
+		if (confetti.length <= 10) initConfetti();
+
+		window.requestAnimationFrame(render);
+	};
+
+	//---------Execution--------
+	initConfetti();
+	render();
+
+	//----------Resize----------
+	window.addEventListener('resize', function () {
+		resizeCanvas();
+	});
+
+	//------------Click------------
+	window.addEventListener('click', function () {
+		initConfetti();
+	});
+
+</script>

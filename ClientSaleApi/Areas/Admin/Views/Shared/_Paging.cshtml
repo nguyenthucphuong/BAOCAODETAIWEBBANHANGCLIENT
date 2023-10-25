@@ -1,0 +1,33 @@
+﻿@model ClientSaleApi.Models.ViewModels.PagingViewModel
+<div class="custom-pagination d-flex justify-content-between align-items-center chosen-select-single mg-b-20">
+    <div>
+        <label for="pageSize" class="me-2" style="color: white;">Rows per page:</label>
+        <select id="pageSize" class="select2_demo_3 form-control" style="color: white; background-color: #152036;">
+            <option selected value="6">6</option>
+            <option value="12">12</option>
+            <option value="24">24</option>
+            <option value="48">48</option>
+            <option value="All">All</option>
+        </select>
+    </div>
+    @Html.PagedListPager((IPagedList) new StaticPagedList<dynamic>(new List<dynamic>(), Model.Page, Model.PageSize, Model.TotalCount), page => Url.Action("Index", new { MaxResultCount = Model.PageSize, page }), new PagedListRenderOptions() { MaximumPageNumbersToDisplay = 2 })
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var totalCount = '@Model.TotalCount';
+        var pageSize = '@(Model.PageSize == Model.TotalCount ? "All" : Model.PageSize)';
+        $('#pageSize').val(pageSize);
+        $('#pageSize').on('change', function () {
+            pageSize = $(this).val();
+            if (pageSize === "All") {
+                pageSize = totalCount;
+            }
+            window.location.href = '@Url.Action("Index")?MaxResultCount=' + pageSize;
+        });
+    });
+</script>
+
+
+
+

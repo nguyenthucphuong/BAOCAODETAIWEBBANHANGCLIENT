@@ -1,0 +1,47 @@
+﻿@model ClientSaleApi.Models.ViewModels.SimpleListViewModel<OutputShop>
+@using ClientSaleApi.Models.ViewModels.Shops
+
+<div id="loading" class="loading" style="display: none;"></div>
+@foreach (var product in Model.Items)
+{
+	<div class="col-lg-3 col-md-6 col-sm-6 pb-1">
+		<div class="product-item bg-light mb-4">
+			<div class="text-center py-4">
+				<a class="h6 productloading text-decoration-none text-truncate" asp-controller="Shops" asp-action="SelectProduct" asp-route-productId="@product.ProductId" asp-route-friendlyUrl="@product.FriendlyUrl">
+					@if (!string.IsNullOrEmpty(product.ProductImage))
+					{
+						<img src="@Url.Content("http://localhost:5260/"+@product.ProductImage)" alt="Product-Image" width="200" height="200" object-fit: contain;>
+					}
+					<div class="text-center py-4">
+						<span class="h6 text-decoration-none text-truncate" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@product.ProductName</span>
+					</div>
+				</a>
+				<div class="d-flex align-items-center justify-content-center mt-2">
+					@if (product.DiscountPrice < product.ProductPrice)
+					{
+						<h5>@string.Format("{0:N0}", product.DiscountPrice)</h5>
+
+						<h6 class="text-muted ml-2"><del>@string.Format("{0:N0}", product.ProductPrice)</del></h6>
+					}
+					else
+					{
+						<h5>@string.Format("{0:N0}", product.ProductPrice)</h5>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+}
+<script>
+	$(document).ready(function () {
+		$('.productloading').on('click', function (event) {
+			new Promise(function (resolve, reject) {
+				setTimeout(resolve, 2000);
+				$('#loading').show();
+				window.location.href = url.href;
+			}).then(function () {
+				$('#loading').hide();
+			});
+		});
+	});
+</script>

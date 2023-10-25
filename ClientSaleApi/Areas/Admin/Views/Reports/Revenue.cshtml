@@ -1,0 +1,151 @@
+﻿@model ClientSaleApi.Models.Reports.ReportIndexViewModel
+@{
+	ViewData["Title"] = "Revenue";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutDashboard.cshtml";
+	<script src="~/template/nalika/js/data-table/bootstrap-table.js"></script>
+	<script src="~/template/nalika/js/data-table/tableExport.js"></script>
+	<script src="~/template/nalika/js/data-table/bootstrap-table-export.js"></script>
+}
+
+<div class="data-table-area mg-tb-15">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="sparkline13-list" style="color: white">
+					<h4>Revenue Report</h4>
+					<form asp-action="Revenue" asp-controller="Reports" asp-area="Admin" method="get">
+						<div class="form-group-inner">
+							<div class="row">
+								<div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+									<div class="col-lg-5 col-md-4 col-sm-4 col-xs-12">
+										<div class="form-select-list">
+											<label class="form-label" style="color: white;">Orders</label><br />
+											<div class="mg-b-20 form-control" style="color: white;"> @Model.TotalOrders </div>
+										</div>
+									</div>
+									<div class="col-lg-7 col-md-8 col-sm-8 col-xs-12">
+										<div class="form-select-list">
+											<label class="form-label" style="color: white;">Revenues</label><br />
+											<div class="mg-b-20 form-control" style="color: white;background-color: #152036;"> @Model.TotalRevenue.ToString("N0") </div>
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-9 col-md-8 col-sm-8 col-xs-12">
+									<div class="row">
+										<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+											<div class="form-select-list">
+												<label for="reportType" class="form-label" style="color: white;">Chọn báo cáo:</label>
+												<select id="reportType" name="reportType" onchange="updateInputType()" class="mg-b-20 form-control" style="color: white; background-color: #152036;">
+													<option value="date" selected="@(Model.ReportType?.ToString() == "date")">Ngày</option>
+													<option value="month" selected="@(Model.ReportType == "month")">Tháng</option>
+													<option value="quarter" selected="@(Model.ReportType == "quarter")">Quý</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12" style="display: flex; align-items: center; justify-content: center;">
+											<div class="form-group data-custon-pick data-custom-mg text-muted" id="data_5">
+												<div class="input-daterange input-group text-white text-center bg-dark" id="datepicker">
+													<label style="color: white;">StartDate</label>
+													<input asp-for="StartDate" type="text" class="form-control" style="color: white;">
+													<span class="input-group-addon" style="background-color: #1b2a47;">to</span>
+													<label style="color: white;">EndDate</label>
+													<input asp-for="EndDate" type="text" class="form-control" style="color: white;">
+												</div>
+											</div>
+										</div>
+										<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+											<div class="text-center">
+												<input type="submit" class="btn btn-custon-four btn-success" style="color: white; margin-top: 27px;" value="Xem kết quả" />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="sparkline12-list mg-b-15">
+						<div class="sparkline12-graph">
+							<div class="static-table-list">
+								<table id="table" class="table" style="color: white !important;" data-toggle="table" data-search="true" data-show-columns="true" data-key-events="true" data-show-toggle="true" data-resizable="true" data-cookie="true" data-cookie-id-table="saveId" data-show-export="true" data-click-to-select="true" data-toolbar="#toolbar">
+									<thead>
+										<tr>
+											<th class="text-center" data-field="stt" data-sortable="true">STT</th>
+											<th class="text-center" data-field="date" data-sortable="true">Date</th>
+											<th class="text-center" data-field="revenue" data-sortable="true">Revenue</th>
+											<th class="text-center" data-field="refund" data-sortable="true">Refund</th>
+											<th class="text-center" data-field="total" data-sortable="true">Total</th>
+										</tr>
+									</thead>
+									<tbody>
+										@if (Model != null && Model.Items != null)
+										{
+											int i = 0;
+											foreach (var item in Model.Items)
+											{
+												i++;
+												var total = item.Revenue - item.Refund;
+												<tr>
+													<td>@i</td>
+													<td>@item.OrderDatetime.ToString("dd/MM/yyyy")</td>
+													<td>@item.Revenue.ToString("N0")</td>
+													<td>@((item.Refund != 0) ? "-" + item.Refund.ToString("N0") : "")</td>
+													<td>@total.ToString("N0")</td>
+												</tr>
+											}
+											var totalRevenueInTable = Model.Items.Sum(r => r.Revenue);
+											var totalRefundInTable = Model.Items.Sum(r => r.Refund);
+											var totalInTable = totalRevenueInTable - totalRefundInTable;
+											<tr>
+												<td colspan="2"><strong>Total</strong></td>
+												<td><strong>@totalRevenueInTable.ToString("N0")</strong></td>
+												<td><strong>@((totalRefundInTable != 0) ? "-" + totalRefundInTable.ToString("N0") : "")</strong></td>
+												<td><strong>@totalInTable.ToString("N0")</strong></td>
+											</tr>
+										}
+									</tbody>
+								</table>
+
+								<div class="row">
+									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+										<label for="pageSize" class="me-2" style="color: white;">Rows per page:</label>
+										<select id="pageSize" class="mg-b-20 select2_demo_3 form-control select2-hidden-accessible" style="color: white; background-color: #152036;width:70px;">
+											<option selected value="6">6</option>
+											<option value="12">12</option>
+											<option value="24">24</option>
+											<option value="48">48</option>
+											<option value="All">All</option>
+										</select>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-right custom-pagination">
+										@if (Model != null && Model.PagingModel != null)
+										{
+											@Html.PagedListPager((IPagedList) new StaticPagedList<dynamic>(new List<dynamic>(), Model.PagingModel.Page, Model.PagingModel.PageSize, Model.PagingModel.TotalCount), page => Url.Action("Revenue", new { reportType = Model.ReportType, startDate = Model.StartDate.ToString("yyyy-MM-dd"), endDate = Model.EndDate.ToString("yyyy-MM-dd"), pageSize = Model.PagingModel.PageSize, page }), new PagedListRenderOptions() { MaximumPageNumbersToDisplay = 2 })
+										}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function () {
+		var totalCount = '@Model?.PagingModel?.TotalCount';
+		var pageSize = '@(Model?.PagingModel?.PageSize == Model?.PagingModel?.TotalCount ? "All" : Model?.PagingModel?.PageSize)';
+		$('#pageSize').val(pageSize);
+		$('#pageSize').on('change', function () {
+			pageSize = $(this).val();
+			if (pageSize === "All") {
+				pageSize = totalCount;
+			}
+			window.location.href = '/bao-cao/doanh-thu?reportType=' + '@Model?.ReportType' + '&startDate=' + '@Model?.StartDate.ToString("yyyy-MM-dd")' + '&endDate=' + '@Model?.EndDate.ToString("yyyy-MM-dd")' + '&page=' + '@Model?.PagingModel?.Page' + '&pageSize=' + pageSize;
+		});
+	});
+</script>
+
+
+
+

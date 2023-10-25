@@ -1,0 +1,115 @@
+﻿@model ClientSaleApi.Models.ViewModels.ListViewModel<CartEx>
+@using ClientSaleApi.Models.Carts
+
+<table class="table table-light table-borderless table-hover text-center mb-0">
+	@if (Model != null && Model?.TotalCount == 0)
+	{
+		<caption class="text-center"> Không có dữ liệu </caption>
+	}
+	<thead class="thead-dark">
+		<tr>
+			<th>Products</th>
+			<th>Price</th>
+			<th>Quantity</th>
+			<th>Total</th>
+			<th>Remove</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model != null)
+		{
+			@foreach (var item in Model.Items)
+			{
+				<tr>
+					@if (!string.IsNullOrEmpty(item.ProductImage))
+					{
+						<td class="text-start" style="text-align: left;"><img src="@Url.Content("http://localhost:5260/"+@item.ProductImage)" alt="Product-Image" style="width: 50px;"> @item.ProductName</td>
+					}
+					else
+					{
+						<td class="text-start" style="text-align: left;"> @item.ProductName</td>
+					}
+					@if (item.Discount > 0)
+					{
+						<td class="text-start item-price" style="text-align: right;"> @item.ProductPrice.ToString("N0")<br /> @($"-{item.Discount}%") </td>
+					}
+					else
+					{
+						<td class="text-start item-price" style="text-align: right;"> @item.ProductPrice.ToString("N0") </td>
+					}
+					<td class="align-middle">
+						<form>
+							<input type="hidden" name="productId" value="@item.ProductId" />
+							<input type="hidden" name="changeQuantity" value="@item.Quantity" />
+							<div class="input-group quantity mx-auto" style="width: 100px;">
+								<div class="input-group-btn">
+									<button class="btn btn-sm btn-primary btn-minus" name="changeQuantity" value="-1">
+										<i class="fa fa-minus"></i>
+									</button>
+								</div>
+								<input type="number" class="form-control form-control-sm bg-secondary border-0 text-center" value="@item.Quantity" min="1" max=5 oninvalid="this.setCustomValidity('Vui lòng nhập: 1 <= số lượng <=5')" oninput="this.setCustomValidity('')">
+								<div class="input-group-btn">
+									<button class="btn btn-sm btn-primary btn-plus" name="changeQuantity" value="+1">
+										<i class="fa fa-plus"></i>
+									</button>
+								</div>
+							</div>
+						</form>
+					</td>
+					@{
+						long Total = item.Quantity * item.ProductPrice;
+						long TotalDiscount = (item.Discount != 0) ? (long)(item.Quantity * item.ProductPrice * item.Discount!.Value) / 100 : 0;
+					}
+					@if (item.Discount > 0)
+					{
+						<td class="text-start item-total" style="text-align: right;"> @Total.ToString("N0")<br> @(TotalDiscount != 0 ? "-" + TotalDiscount.ToString("N0") : "") </td>
+					}
+					else
+					{
+						<td class="text-start item-total" style="text-align: right;"> @Total.ToString("N0") </td>
+					}
+					<td class="align-middle">
+						<button type="button" class="btn btn-sm btn-danger xoa-item-id" data-product-id="@item.ProductId"><i class="fa fa-times"></i></button>
+					</td>
+				</tr>
+			}
+		}
+	</tbody>
+</table>
+
+<script>
+	$(document).ready(function () {
+		$(".btn-plus, .btn-minus").on("click", function (e) {
+			e.preventDefault();
+			var productId = $(this).closest("form").find("input[name='productId']").val();
+			var changeQuantity = $(this).val();
+			$.ajax({
+				url: `/gio-hang/cap-nhat-so-luong?productId=${productId}&changeQuantity=${changeQuantity}`,
+				type: "POST",
+				success: function (data) {
+					location.reload();
+				},
+				error: function (error) {
+					console.log('Error calling api:', textStatus, errorThrown);
+				}
+			});
+
+		});
+
+		$('.xoa-item-id').click(function () {
+			var productId = $(this).data('product-id');
+			$.ajax({
+				url: `/gio-hang/xoa-item/${productId}`,
+				type: 'GET',
+				success: function (data) {
+					location.reload();
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log('Error calling api:', textStatus, errorThrown);
+				}
+			});
+
+		});
+
+	});
+</script>

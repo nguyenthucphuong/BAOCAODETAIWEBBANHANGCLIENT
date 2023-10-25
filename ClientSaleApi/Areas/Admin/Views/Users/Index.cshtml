@@ -1,0 +1,108 @@
+﻿@model ClientSaleApi.Models.ViewModels.IndexViewModel<UserEx>
+@using ClientSaleApi.Models.Users;
+@{
+	ViewData["Title"] = "Index";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutDashboard.cshtml";
+	<partial name="_BootstrapTablePartial" />
+}
+
+@section Search {
+	<form asp-area="Admin" asp-controller="Users" asp-action="Index" user="search">
+		<input type="text" placeholder="Search..." class="form-control" name="search" style="color: white;">
+		<a href="#" onclick="this.closest('form').submit()">
+			<i class="fa fa-search"></i>
+		</a>
+	</form>
+}
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+	<partial name="_MessagePartial" model="@Model.Message" />
+}
+<div class="product-status mg-b-30">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="product-status-wrap">
+					<h4>Users List</h4>
+					<div class="add-product">
+						<a asp-area="Admin" asp-controller="Users" asp-action="Edit">Add</a>
+					</div>
+					<table id="table" data-toggle="table" data-custom-sort="customSort">
+						@if (Model.Items != null && Model.Items.Count == 0)
+						{
+							<caption class="text-center">
+								Không có dữ liệu
+							</caption>
+						}
+						<thead class="text-center">
+							<tr>
+								<th class="text-center" data-field="stt" data-sortable="true">STT</th>
+								<th class="text-center" data-field="username" data-sortable="true">UserName</th>
+								<th class="text-center" data-field="email" data-sortable="true">Email</th>
+								<th class="text-center" data-field="role" data-sortable="true">RoleName</th>
+								<th class="text-center" data-field="status" data-sortable="true">Status</th>
+								<th data-field="isActive" data-visible="false">IsActive</th>
+								<th class="text-center">Setting</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (Model != null)
+							{
+								int count = (Model.Items!.PageNumber - 1) * Model.Items.PageSize + 1;
+								@foreach (var user in Model.Items)
+								{
+									<tr>
+										<td class="text-center">@count</td>
+										<td class="text-start">@user.UserName</td>
+										<td class="text-start">@user.Email</td>
+										<td class="text-start">@user.RoleName</td>
+										<td class="text-center">
+											<form asp-area="Admin" asp-controller="Users" asp-action="CapNhatTrangThai"
+												  asp-route-userId="@user.UserId" asp-route-page="@Model?.PagingModel?.Page" asp-route-maxResultCount="@Model?.PagingModel?.PageSize" method="post">
+												<button type="submit" class="@(user.IsActive == true ? "pd-setting" : "ds-setting")">
+													@((user.IsActive == true) ? "Kích hoạt" : (user.IsActive == false) ? "Tạm khóa" : "Lỗi")
+												</button>
+											</form>
+										</td>
+										<td>@user.IsActive</td>
+										<td class="text-center">
+											<a asp-area="Admin" asp-controller="Users" asp-action="Edit" asp-route-userid="@user.UserId" class="pd-setting-ed" data-toggle="tooltip" title="Edit">
+												<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+											</a>
+											<a class="px-2 delete-button" href="@(user.IsActive == true ? Url.Action("Xoa", "Users", new { area = "Admin", userId = user.UserId }) : $"#deleteModal_{count}")" data-toggle="@(user.IsActive == true ? "" : "modal")" data-target="@(user.IsActive == true ? "" : $"#deleteModal_{count}")">
+												<i class="fa fa-trash-o" aria-hidden="true"></i>
+											</a>
+											<div class="modal fade" id="deleteModal_@count" tabindex="-1" user="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+												<div class="modal-dialog" user="document">
+													<div class="modal-content text-white" style="background-color: #152036;">
+														<div class="modal-header">
+															<h5 class="modal-title" id="deleteModalLabel">Xác nhận</h5>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">×</span>
+															</button>
+														</div>
+														<div class="modal-body" style="font-size: 18px;">
+															Bạn có chắc chắn muốn xóa không?
+														</div>
+														<div class="modal-footer">
+															<button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+															<a asp-area="Admin" asp-controller="Users" asp-action="Xoa" asp-route-userId="@user.UserId" class="btn btn-danger">Xóa</a>
+														</div>
+													</div>
+												</div>
+											</div>
+										</td>
+									</tr>
+									count++;
+								}
+							}
+						</tbody>
+					</table>
+					<partial name="_Paging" model="@Model?.PagingModel" />
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+

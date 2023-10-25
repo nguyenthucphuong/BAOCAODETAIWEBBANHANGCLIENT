@@ -1,0 +1,173 @@
+﻿@model ClientSaleApi.Models.Products.ProductEx
+@using Newtonsoft.Json
+@{
+	ViewData["Title"] = "Edit";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutDashboard.cshtml";
+}
+
+<div class="single-product-tab-area mg-b-30">
+	<!-- Single pro tab review Start-->
+	<div class="single-pro-review-area">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="review-tab-pro-inner">
+						<form asp-area="Admin" asp-controller="Products" asp-action="@(Model == null ? "Them" : "CapNhat")" asp-route-productid="@(Model?.ProductId)" enctype="multipart/form-data" method="post">
+							<div id="myTabContent" class="tab-content custom-product-edit">
+								<div class="product-tab-list tab-pane fade active in" id="description">
+									<div class="row">
+										<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+											<div class="review-content-section">
+												@if (Model != null)
+												{
+													<div class="input-group mg-b-pro-edt" style="display:none">
+														<span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
+														<input asp-for="ProductId" type="text" class="form-control" aria-describedby="text" readonly>
+													</div>
+												}
+												<div class="input-group mg-b-pro-edt">
+													<span class="input-group-addon"><i class="icon nalika-edit" aria-hidden="true"></i></span>
+													<input id="ProductName" asp-for="ProductName" type="text" class="form-control" placeholder="Name" aria-describedby="text" required>
+													<span asp-validation-for="ProductName" class="text-danger"></span>
+												</div>
+												<div class="input-group mg-b-pro-edt">
+													<span class="input-group-addon"><i class="icon nalika-edit" aria-hidden="true"></i></span>
+													<input id="ProductPrice" asp-for="ProductPrice" type="text" value="@Model?.ProductPrice?.ToString("0")" class="form-control" placeholder="Price" aria-describedby="text">
+													<span asp-validation-for="ProductPrice" class="text-danger"></span>
+												</div>
+												<div class="input-group mg-b-pro-edt">
+													<span class="input-group-addon"><i aria-hidden="true"></i></span>
+													<textarea asp-for="ProductDes" class="form-control" rows="6" placeholder="Description" aria-describedby="text"></textarea>
+												</div>
+											</div>
+										</div>
+										<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+											<div class="review-content-section">
+												<div class="input-group mg-b-pro-edt">
+													<span class="input-group-addon"><i class="icon nalika-edit" aria-hidden="true"></i></span>
+													<input asp-for="CategoryName" list="categories" class="form-control pro-edt-select form-control-primary" placeholder="Tìm hoặc chọn danh mục" autocomplete="off" aria-describedby="text">
+													<datalist id="categories">
+													</datalist>
+												</div>
+												<div id="promotionDiv" class="input-group mg-b-pro-edt" style="display:none">
+													<span class="input-group-addon"><i class="icon nalika-edit" aria-hidden="true"></i></span>
+													<input asp-for="PromotionName" list="promotions" class="form-control pro-edt-select form-control-primary" placeholder="Tìm hoặc chọn Khuyến mãi" aria-describedby="text">
+													<datalist id="promotions">
+													</datalist>
+												</div>
+												<div class="input-group mg-b-pro-edt form-check">
+													<input name="IsNew" id="isnew" class="form-check-input" type="checkbox" @(Model?.IsNew == true ? "checked" : "") />
+													<label asp-for="IsNew" class="form-check-label" style="color: white; margin-left: 10px;"> New</label>
+												</div>
+												<div class="input-group mg-b-pro-edt form-check">
+													<input name="IsSale" id="issale" class="form-check-input" type="checkbox" @(Model?.IsSale == true ? "checked" : "") />
+													<label asp-for="IsSale" class="form-check-label" style="color: white; margin-left: 10px;"> Sale</label>
+												</div>
+												<div class="input-group mg-b-pro-edt form-check">
+													<input name="IsPro" id="ispro" class="form-check-input" type="checkbox" @(Model?.IsPro == true ? "checked" : "") />
+													<label asp-for="IsPro" class="form-check-label" style="color: white; margin-left: 10px;"> Pro</label>
+												</div>
+												<div class="input-group mg-b-pro-edt form-check">
+													<input name="IsActive" id="kichhoat" class="form-check-input" type="checkbox" @(Model?.IsActive == true ? "checked" : "") />
+													<label asp-for="IsActive" class="form-check-label" style="color: white; margin-left: 10px;"> Kích hoạt</label>
+												</div>
+												<div class="input-group mg-b-pro-edt">
+													<span class="input-group-addon"><i class="icon nalika-picture" aria-hidden="true"></i></span>
+													<input asp-for="imageFile" type="file" class="form-control">
+												</div>
+												<input type="hidden" asp-for="ProductImage" value="@Model?.ProductImage" />
+												<td>
+													@if (!string.IsNullOrEmpty(@Model?.ProductImage))
+													{
+														<img src="@Url.Content("http://localhost:5260/"+@Model.ProductImage)" width="50" height="50">
+													}
+												</td>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+											<div class="text-center custom-pro-edt-ds">
+												<button type="submit" id="@((Model == null) ?"them" : "capnhat")"
+														class="btn btn-ctl-bt waves-effect waves-light m-r-10" data-bs-toggle="modal" data-bs-target="#errorModal">
+													@((Model == null) ? "Add" : "Update")
+												</button>
+												<button type="reset" class="btn btn-ctl-bt waves-effect waves-light" value="Reset">
+													Reset
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$.ajax({
+			url: '/san-pham/danh-sach-category',
+			type: 'GET',
+			success: function (data) {
+				$('#categories').empty();
+				// Thêm các option mới vào datalist
+				data.forEach(function (item) {
+					$('#categories').append('<option value="' + item + '">' + item + '</option>');
+				});
+				console.log(data);
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log('Error calling api:', textStatus, errorThrown);
+			}
+		});
+		$.ajax({
+			url: '/san-pham/danh-sach-promotion',
+			type: 'GET',
+			success: function (data) {
+				$('#promotions').empty();
+				data.forEach(function (item) {
+					$('#promotions').append('<option value="' + item + '">' + item + '</option>');
+				});
+				console.log(data);
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log('Error calling api:', textStatus, errorThrown);
+			}
+		});
+
+		//<!--Hiển thị phân tách hàng triệu, ngàn, trăm-- >
+		const inputFields = $(' #ProductPrice');
+		inputFields.on('input', function () {
+			let inputValue = $(this).val().replaceAll(",", "").replaceAll(/[^0-9]/g, "");
+			if (inputValue.length === 0) {
+				$(this).val('');
+			} else if (inputValue.length === 1) {
+				let number = parseInt(inputValue);
+				if (isNaN(number) || number <= 0) {
+					number = 0;
+				}
+				$(this).val(number.toLocaleString('en-US'));
+			} else {
+				$(this).val(parseInt(inputValue).toLocaleString('en-US'));
+			}
+		});
+
+		//<!--Hiển thị input Khuyến mãi nếu ô Khuyến mãi được check-- >
+		$('#ispro').on('change', function () {
+			if ($(this).is(':checked')) {
+				$('#promotionDiv').show();
+			} else {
+				$('#promotionDiv').hide();
+			}
+		});
+		if ($('#ispro').is(':checked')) {
+			$('#promotionDiv').show();
+		}
+	});
+
+</script>

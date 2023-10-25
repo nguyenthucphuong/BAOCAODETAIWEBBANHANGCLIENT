@@ -1,0 +1,27 @@
+﻿@model ClientSaleApi.Models.ViewModels.HomeIndexViewModel
+@using ClientSaleApi.Models.Products;
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutMultishop.cshtml";
+}
+
+<div class="container-fluid pt-5">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Newest</span></h2>
+    <div class="row px-xl-5 pb-3">
+        <partial name="_Products" model="@Model.NewProducts" />
+    </div>
+</div>
+
+<div class="container-fluid pt-5">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Best Selling</span></h2>
+    <div class="row px-xl-5 pb-3">
+        <partial name="_Products" model="@Model.SaleProducts" />
+    </div>
+</div>
+<div class="container-fluid pt-5">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Promotions</span></h2>
+    <div class="row px-xl-5 pb-3">
+        <partial name="_Products" model="@Model.ProProducts" />
+    </div>
+</div>
+

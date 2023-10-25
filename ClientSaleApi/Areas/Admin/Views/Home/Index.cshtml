@@ -1,0 +1,277 @@
+﻿
+@{
+	ViewData["Title"] = "Index";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutDashboard.cshtml";
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+}
+
+<div class="section-admin container-fluid res-mg-t-15">
+	<div class="row admin text-center">
+		<div class="col-md-12">
+			<div class="row">
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+					<div class="admin-content analysis-progrebar-ctn">
+						<h4 class="text-left text-uppercase"><b>Total Sales</b></h4>
+						<div class="row vertical-center-box vertical-center-box-tablet">
+							<div class="col-xs-3 mar-bot-15 text-left">
+								<label id="percentSales" class="label bg-green">30% <i class="fa fa-level-up" aria-hidden="true"></i></label>
+							</div>
+							<div class="col-xs-9 cus-gh-hd-pro">
+								<h2 id="totalSales" class="text-right no-margin">10,000</h2>
+							</div>
+						</div>
+						<div class="progress progress-mini">
+							<div id="percentBarSales" style="width: 18%;" class="progress-bar bg-green"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" style="margin-bottom:1px;">
+					<div class="admin-content analysis-progrebar-ctn res-mg-t-30">
+						<h4 class="text-left text-uppercase"><b>Total Refunds</b></h4>
+						<div class="row vertical-center-box vertical-center-box-tablet">
+							<div class="text-left col-xs-3 mar-bot-15">
+								<label id="percentRefunds" class="label bg-red">15% <i class="fa fa-level-down" aria-hidden="true"></i></label>
+							</div>
+							<div class="col-xs-9 cus-gh-hd-pro">
+								<h2 id="totalRefunds" class="text-right no-margin">5,000</h2>
+							</div>
+						</div>
+						<div class="progress progress-mini">
+							<div id="percentBarRefunds" style="width: 38%;" class="progress-bar progress-bar-danger bg-red"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+					<div class="admin-content analysis-progrebar-ctn res-mg-t-30">
+						<h4 class="text-left text-uppercase"><b>Total Revenues</b></h4>
+						<div class="row vertical-center-box vertical-center-box-tablet">
+							<div class="text-left col-xs-3 mar-bot-15">
+								<label id="percentRevenues" class="label bg-blue">50% <i class="fa fa-level-up" aria-hidden="true"></i></label>
+							</div>
+							<div class="col-xs-9 cus-gh-hd-pro">
+								<h2 id="totalRevenues" class="text-right no-margin">$70,000</h2>
+							</div>
+						</div>
+						<div class="progress progress-mini">
+							<div id="percentBarRevenues" style="width: 60%;" class="progress-bar bg-blue"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+					<div class="admin-content analysis-progrebar-ctn res-mg-t-30">
+						<h4 class="text-left text-uppercase"><b>Total Orders</b></h4>
+						<div class="row vertical-center-box vertical-center-box-tablet">
+							<div class="text-left col-xs-3 mar-bot-15">
+								<label id="percentOrders" class="label" style="background-color: #E4A11B;">80% <i class="fa fa-level-up" aria-hidden="true"></i></label>
+							</div>
+							<div class="col-xs-9 cus-gh-hd-pro">
+								<h2 id="totalOrders" class="text-right no-margin">$100,000</h2>
+							</div>
+						</div>
+						<div class="progress progress-mini">
+							<div id="percentBarOrders" style="width: 60%;background-color: #E4A11B;" class="progress-bar"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="product-sales-area mg-tb-30">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="product-sales-chart">
+					<div class="portlet-title">
+						<div class="row">
+							<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+								<div class="caption pro-sl-hd text-center">
+									<span class="caption-subject text-uppercase text-right" style="float: left;"><b>Top Report</b></span>
+									<div class="d-flex form-select-list align-items-center">
+										<label style="color: white;">Select Report</label>
+										<select id="chartSelector" class="form-control pro-edt-select form-control-primary" style="width: auto; margin: 0 auto !important;">
+											<option value="columnchartselling">Top 5 Selling Products</option>
+											<option value="columnchartrevenue">Top 5 Revenue Products</option>
+											<option value="columnchartdiscount">Top 5 Discount Products</option>
+											<option value="columnchartcategory">Top 5 Category</option>
+											<option value="columnchartpayment">Payments</option>
+										</select>
+									</div>
+								</div>
+								<div id="columnchartselling" style="width: 900px; height: 500px;"></div>
+								<div id="columnchartrevenue" style="width: 900px; height: 500px;"></div>
+								<div id="columnchartdiscount" style="width: 900px; height: 500px;"></div>
+								<div id="columnchartcategory" style="width: 900px; height: 500px;"></div>
+								<div id="columnchartpayment" style="width: 900px; height: 500px;"></div>
+							</div>
+							<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+								<div class="caption pro-sl-hd text-center">
+									<span class="caption-subject text-uppercase"><b>Monthly Summary Report</b></span>
+								</div>
+								<div id="donutchart" style="width: 900px; height: 500px;"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="product-sales-area mg-tb-30">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="product-sales-chart">
+					<div class="portlet-title">
+						<div class="caption pro-sl-hd text-left">
+							<span class="caption-subject text-uppercase"><b>3 Months Report</b></span>
+						</div>
+						<div id="linechart"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	//<------------------------ Biểu đồ tròn ------------------------>
+	google.charts.load('current', { 'packages': ['corechart'] });
+	google.charts.setOnLoadCallback(fetchAndDrawChartDonut);
+
+	async function fetchAndDrawChartDonut() {
+		try {
+			const response = await fetch('http://localhost:5260/api/Reports/revenue-report');
+			const data = await response.json();
+			// Cập nhật giá trị
+			document.querySelector('#totalSales').textContent = data.totalSaleCurrentMonth.toLocaleString();
+			document.querySelector('#totalRefunds').textContent = data.totalRefundCurrentMonth.toLocaleString();
+			document.querySelector('#totalRevenues').textContent = data.totalRevenueCurrentMonth.toLocaleString();
+			document.querySelector('#totalOrders').textContent = data.totalOrderCurrentMonth.toLocaleString();
+			// Cập nhật phần trăm
+			var percentSalesElement = document.querySelector('#percentSales');
+			percentSalesElement.textContent = data.percentSale.toFixed(2) + '%';
+			var percentRefundsElement = document.querySelector('#percentRefunds');
+			percentRefundsElement.textContent = data.percentRefund.toFixed(2) + '%';
+			var percentRevenuesElement = document.querySelector('#percentRevenues');
+			percentRevenuesElement.textContent = data.percentRevenue.toFixed(2) + '%';
+			var percentOrdersElement = document.querySelector('#percentOrders');
+			percentOrdersElement.textContent = data.percentOrder.toFixed(2) + '%';
+			// Cập nhật icon tăng giảm
+			const elements = ['Sales', 'Refunds', 'Revenues', 'Orders'];
+			elements.forEach(element => {
+				const percentElement = document.querySelector(`#percent${element}`);
+				percentElement.innerHTML += ` <i class="fa fa-level-${data[`percent${element}`] > 0 ? 'up' : 'down'}" aria-hidden="true"></i>`;
+				const percentBarElement = document.querySelector(`#percentBar${element}`);
+				percentBarElement.style.width = (data[`percent${element}`] <= 0 ? 100 + data[`percent${element}`] : data[`percent${element}`]) + '%';
+			});
+			var chartData = google.visualization.arrayToDataTable([
+				['Task', 'Hours per Day'],
+				['Total Refunds', data.totalRefundCurrentMonth],
+				['Total Revenues', data.totalRevenueCurrentMonth],
+				['Total Orders', data.totalOrderCurrentMonth]
+			]);
+			var options = {
+				title: 'Total Revenues',
+				backgroundColor: { fill: 'transparent' },
+				titlePosition: 'none',
+				titleTextStyle: { color: 'white' },
+				legend: { position: 'bottom', textStyle: { color: 'white' } },
+				colors: ['#eb4b4b', '#2eb7f3', '#f3b12e'],
+				chartArea: { left: 60, top: 100 },
+				pieHole: 0.4
+			};
+			var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+			chart.draw(chartData, options);
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
+	//<------------------------ Biểu đồ cột------------------------>
+	google.charts.load('current', { 'packages': ['corechart'] });
+
+	async function fetchAndDrawChart(url, chartElementId, title, column1, column2) {
+		try {
+			const response = await fetch(url);
+			const data = await response.json();
+			var chartData = new google.visualization.DataTable();
+			chartData.addColumn('string', column1);
+			chartData.addColumn('number', column2);
+			chartData.addColumn({ type: 'string', role: 'style' });
+			var colors = ['#24caa1', '#eb4b4b', '#2eb7f3', '#f3b12e', '#2e83f3'];
+			var dataPoints = data.map((item, index) => [item[column1], item[column2], colors[index]]);
+			chartData.addRows(dataPoints);
+			var options = {
+				title: title,
+				backgroundColor: { fill: 'transparent' },
+				titleTextStyle: { color: 'white' },
+				hAxis: { textStyle: { color: 'white' } },
+				vAxis: { textStyle: { color: 'white' } },
+				chartArea: { left: 100, top: 50},
+				legend: 'none'
+			};
+			var chart = new google.visualization.ColumnChart(document.getElementById(chartElementId));
+			chart.draw(chartData, options);
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
+
+	var charts = {
+		columnchartselling: { url: 'http://localhost:5260/api/Reports/top-selling-products', title: 'Top 5 Selling Products', column1: 'productName', column2: 'quantitySold' },
+		columnchartrevenue: { url: 'http://localhost:5260/api/Reports/top-revenue-products', title: 'Top 5 Revenue Products', column1: 'productName', column2: 'revenue' },
+		columnchartdiscount: { url: 'http://localhost:5260/api/Reports/top-discount-products', title: 'Top 5 Discount Products', column1: 'productName', column2: 'discountRevenue' },
+		columnchartcategory: { url: 'http://localhost:5260/api/Reports/top-categories', title: 'Top 5 Category', column1: 'categoryName', column2: 'categoryRevenue' },
+		columnchartpayment: { url: 'http://localhost:5260/api/Reports/payment-revenues', title: 'Payments', column1: 'paymentName', column2: 'revenuePayment' }
+	};
+
+	document.getElementById('chartSelector').addEventListener('change', function () {
+		// Ẩn tất cả các biểu đồ
+		Object.keys(charts).forEach(function (chartId) {
+			document.getElementById(chartId).style.display = 'none';
+		});
+		var selectedChart = charts[this.value];
+		// Hiển thị biểu đồ được chọn
+		document.getElementById(this.value).style.display = 'block';
+		fetchAndDrawChart(selectedChart.url, this.value, selectedChart.title, selectedChart.column1, selectedChart.column2);
+	});
+
+	google.charts.setOnLoadCallback(function () {
+		document.getElementById('chartSelector').dispatchEvent(new Event('change'));
+	});
+	//<------------------------ Biểu đồ Line ------------------------>
+	google.charts.load('current', { packages: ['corechart', 'line'] });
+	google.charts.setOnLoadCallback(fetchAndDrawChartLine);
+
+	async function fetchAndDrawChartLine() {
+		try {
+			const response = await fetch('http://localhost:5260/api/Reports/line-day-in-3-month');
+			const data = await response.json();
+			var chartData = new google.visualization.DataTable();
+			chartData.addColumn('date', 'X');
+			chartData.addColumn('number', 'Order');
+			chartData.addColumn('number', 'Revenue');
+			chartData.addColumn('number', 'Refund');
+			chartData.addColumn('number', 'Sale');
+			chartData.addRows(data.map(item => [new Date(item.day), item.orderTotal, item.revenueTotal, item.refundTotal, item.saleTotal]));
+			var options = {
+				hAxis: {
+					title: 'Time',
+					textStyle: { color: 'white' }
+				},
+				vAxis: {
+					title: 'Amount',
+					textStyle: { color: 'white' }
+				},
+				backgroundColor: { fill: 'transparent' },
+				titleTextStyle: { color: 'white' },
+				legend: 'none',
+				colors: ['#eb4b4b', '#24caa1', '#2eb7f3', '#f3b12e']
+			};
+			var chart = new google.visualization.LineChart(document.getElementById('linechart'));
+			chart.draw(chartData, options);
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
+</script>

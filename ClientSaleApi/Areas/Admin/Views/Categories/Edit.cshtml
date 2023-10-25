@@ -1,0 +1,61 @@
+﻿@model ClientSaleApi.Models.Categories.CategoryEx
+
+@{
+	ViewData["Title"] = "Edit";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutDashboard.cshtml";
+}
+
+<div class="single-product-tab-area mg-b-30">
+	<!-- Single pro tab review Start-->
+	<div class="single-pro-review-area">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="review-tab-pro-inner">
+						<form asp-area="Admin" asp-controller="Categories" asp-action="@(Model == null ? "Them" : "CapNhat")" asp-route-categoryid="@(Model?.CategoryId)" method="post">
+							<div id="myTabContent" class="tab-content custom-product-edit">
+								<div class="product-tab-list tab-pane fade active in" id="description">
+									<div class="row">
+										<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+											<div class="review-content-section">
+												@if (Model != null)
+												{
+													<div class="input-group mg-b-pro-edt" style="display:none">
+														<span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
+														<input asp-for="CategoryId" type="text" class="form-control" aria-describedby="text" readonly>
+													</div>
+												}
+												<div class="input-group mg-b-pro-edt">
+													<span class="input-group-addon"><i class="icon nalika-edit" aria-hidden="true"></i></span>
+													<input id="CategoryName" asp-for=" CategoryName" type="text" class="form-control" placeholder="Name" aria-describedby="text" required>
+													<span asp-validation-for="CategoryName" class="text-danger"></span>
+												</div>
+												<div class="input-group mg-b-pro-edt form-check">
+													<input name="IsActive" id="kichhoat" class="form-check-input" type="checkbox" @(Model?.IsActive == true ? "checked" : "") />
+													<label asp-for="IsActive" class="form-check-label" style="color: white; margin-left: 10px;"> Kích hoạt</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+											<div class="text-center custom-pro-edt-ds">
+												<button type="submit" id="@((Model == null) ?"them" : "capnhat")"
+														class="btn btn-ctl-bt waves-effect waves-light m-r-10" data-bs-toggle="modal" data-bs-target="#errorModal">
+													@((Model == null) ? "Add" : "Update")
+												</button>
+												<button type="reset" class="btn btn-ctl-bt waves-effect waves-light" value="Reset">
+													Reset
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

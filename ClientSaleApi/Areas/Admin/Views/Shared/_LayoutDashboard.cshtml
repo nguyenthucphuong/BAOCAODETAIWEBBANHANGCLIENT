@@ -1,0 +1,428 @@
+﻿@using Newtonsoft.Json
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Dashboard V.3 | Nalika - Material Admin Template</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- favicon
+		============================================ -->
+	<link rel="shortcut icon" type="image/x-icon" href="~/template/nalika/img/favicon.ico">
+	<!-- Google Fonts
+		============================================ -->
+	<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
+	<!-- Bootstrap CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/bootstrap.min.css">
+	<!-- Bootstrap CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/font-awesome.min.css">
+	<!-- nalika Icon CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/nalika-icon.css">
+	<!-- owl.carousel CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/owl.carousel.css">
+	<link rel="stylesheet" href="~/template/nalika/css/owl.theme.css">
+	<link rel="stylesheet" href="~/template/nalika/css/owl.transitions.css">
+	<!-- animate CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/animate.css">
+	<!-- normalize CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/normalize.css">
+	<!-- meanmenu icon CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/meanmenu.min.css">
+	<!-- main CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/main.css">
+	<!-- morrisjs CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/morrisjs/morris.css">
+	<!-- mCustomScrollbar CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/scrollbar/jquery.mCustomScrollbar.min.css">
+	<!-- metisMenu CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/metisMenu/metisMenu.min.css">
+	<link rel="stylesheet" href="~/template/nalika/css/metisMenu/metisMenu-vertical.css">
+	<!-- calendar CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/calendar/fullcalendar.min.css">
+	<link rel="stylesheet" href="~/template/nalika/css/calendar/fullcalendar.print.min.css">
+	<!-- style CSS
+		============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/style.css">
+	<!-- responsive CSS
+		============================================ -->
+	<!-- style table
+	============================================ -->
+	<link rel="stylesheet" href="~/template/nalika/css/editor/bootstrap-editable.css">
+	<link rel="stylesheet" href="~/template/nalika/css/data-table/bootstrap-table.css">
+	<link rel="stylesheet" href="~/template/nalika/css/data-table/bootstrap-editable.css">
+	<!-- modernizr JS
+		============================================ -->
+	<script src="~/template/nalika/js/vendor/modernizr-2.8.3.min.js"></script>
+	<link rel="stylesheet" href="~/template/nalika/css/datapicker/datepicker3.css">
+	<link rel="stylesheet" href="~/template/nalika/css/colorpicker/colorpicker.css">
+
+	<link rel="stylesheet" href="~/template/css/modals.css">
+	<!-- Ajax
+	   ============================================ -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<!-- Validation
+	   ============================================ -->
+	<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.12/dist/jquery.validate.unobtrusive.min.js"></script>
+	<!-- Datalist
+	   ============================================ -->
+	<script src="https://cdn.jsdelivr.net/npm/datalist-css/dist/datalist-css.min.js"></script>
+	<style>
+		.form-check {
+			display: inline-block;
+			color: white;
+			/*margin-left: 5px;*/
+			margin-right: 50px;
+		}
+
+		.form-control {
+			background-color: #152036;
+		}
+
+		.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+			background-color: #98AFC7;
+		}
+	</style>
+
+</head>
+
+<body class="admin" style="background-color: #152036;">
+	<div class="left-sidebar-pro">
+		<nav id="sidebar" class="">
+			<div class="sidebar-header">
+				<a asp-area="Admin" asp-controller="Home" asp-action="Index"><img class="main-logo" src="/template/nalika/img/logo/logo.png" alt="" /></a>
+				<strong><img src="/template/nalika/img/logo/logosn.png" alt="" /></strong>
+			</div>
+			<div class="nalika-profile">
+				<div class="profile-dtl">
+					<a href="#"><img src="~/template/nalika/img/notification/Lakian.jpg" alt="" /></a>
+				@if (Context.Request.Cookies.ContainsKey("UserName"))
+				{
+					<h2><span class="min-dtn">@Context.Request.Cookies["UserName"]</span></h2>
+				}
+				</div>
+			</div>
+			<div class="left-custom-menu-adp-wrap comment-scrollbar">
+				<nav class="sidebar-nav left-sidebar-menu-pro">
+					<ul class="metismenu" id="menu1">
+						<li>
+							<a href="#" class="has-arrow" aria-expanded="false">
+								<i class="icon nalika-new-file icon-wrap"></i>
+								<span class="mini-click-non">Reports</span>
+							</a>
+							<ul class="submenu-angle" aria-expanded="false">
+								<li><a title="Report OrderList" asp-area="Admin" asp-controller="Reports" asp-action="Index"><span class="mini-sub-pro">Order List</span></a></li>
+								<li><a title="Revenue" asp-area="Admin" asp-controller="Reports" asp-action="Revenue"><span class="mini-sub-pro">Revenue</span></a></li>
+							</ul>
+						</li>
+						<li>
+							<a title="Customers List" asp-area="Admin" asp-controller="Roles" asp-action="Index">
+								<i class="icon nalika-home icon-wrap"></i>
+								<span class="mini-click-non">Roles</span>
+							</a>
+						</li>
+						<li>
+							<a title="User List" asp-area="Admin" asp-controller="Users" asp-action="Index">
+								<i class="icon nalika-home icon-wrap"></i>
+								<span class="mini-click-non">Users</span>
+							</a>
+						</li>
+						<li>
+							<a title="Customers List" asp-area="Admin" asp-controller="Categories" asp-action="Index">
+								<i class="icon nalika-home icon-wrap"></i>
+								<span class="mini-click-non">Categories</span>
+							</a>
+						</li>
+						<li>
+							<a title="Customers List" asp-area="Admin" asp-controller="Products" asp-action="Index">
+								<i class="icon nalika-home icon-wrap"></i>
+								<span class="mini-click-non">Products</span>
+							</a>
+						</li>
+						<li>
+							<a title="Customers List" asp-area="Admin" asp-controller="Payments" asp-action="Index">
+								<i class="icon nalika-home icon-wrap"></i>
+								<span class="mini-click-non">Payments</span>
+							</a>
+						</li>
+						<li>
+							<a title="Customers List" asp-area="Admin" asp-controller="Promotions" asp-action="Index">
+								<i class="icon nalika-home icon-wrap"></i>
+								<span class="mini-click-non">Promotions</span>
+							</a>
+						</li>
+						<li>
+							<a title="Customers List" asp-area="Admin" asp-controller="OrderStatuses" asp-action="Index">
+								<i class="icon nalika-home icon-wrap"></i>
+								<span class="mini-click-non">OrderStatuses</span>
+							</a>
+						</li>
+						<li>
+							<a title="Customers List" asp-area="Admin" asp-controller="Customers" asp-action="Index">
+								<i class="icon nalika-home icon-wrap"></i>
+								<span class="mini-click-non">Customers</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</nav>
+	</div>
+	<!-- Start Welcome area -->
+	<div class="all-content-wrapper">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="logo-pro">
+						<a asp-area="Admin" asp-controller="Home" asp-action="Index"><img class="main-logo" src="/template/nalika/img/logo/logo.png" alt="" /></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="header-advance-area">
+			<div class="header-top-area">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<div class="header-top-wraper">
+								<div class="row">
+									<div class="col-lg-1 col-md-0 col-sm-1 col-xs-12">
+										<div class="menu-switcher-pro">
+											<button type="button" id="sidebarCollapse" class="btn bar-button-pro header-drl-controller-btn btn-info navbar-btn">
+												<i class="icon nalika-menu-task"></i>
+											</button>
+										</div>
+									</div>
+									<div class="col-lg-6 col-md-7 col-sm-6 col-xs-12">
+										<div class="header-top-menu tabl-d-n">
+											<div class="breadcome-heading">
+												@RenderSection("Search", required: false)
+											</div>
+										</div>
+									</div>
+									<div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
+										<div class="header-right-info">
+											<ul class="nav navbar-nav mai-top-nav header-right-menu">
+												<li class="nav-item">
+													@if (Context.Request.Cookies.ContainsKey("UserName"))
+													{
+														<a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+															<i class="icon nalika-user nalika-user-rounded header-riht-inf" aria-hidden="true"></i>
+															<span class="admin-name">WellCome <b>@Context.Request.Cookies["UserName"]!</b></span>
+															<i class="icon nalika-down-arrow nalika-angle-dw nalika-icon"></i>
+														</a>
+													}
+													<ul role="menu" class="dropdown-header-top author-log dropdown-menu animated zoomIn">
+														<li>
+															<a href="#" onclick="document.getElementById('hidden-form-logout').submit()"><span class="icon nalika-unlocked author-log-ic"></span> Log Out</a>
+
+															<form id="hidden-form-logout" asp-area="Admin" asp-controller="Accounts" asp-action="Logout" method="post" style="display: none;"></form>
+														</li>
+													</ul>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="breadcome-area">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<div class="breadcome-list">
+								<div class="row">
+									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+										<div class="breadcomb-wp">
+											<div class="breadcomb-icon">
+												<i class="icon nalika-home"></i>
+											</div>
+											<div class="breadcomb-ctn">
+												<h2>Dashboard Manager</h2>
+												<p>Welcome to <span class="bread-ntd">Admin Template</span></p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<main role="main">
+			<!-- Thông báo khi chọn phần tử không nằm trong danh sách -->
+			<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content" style="background-color: #152036; color: white;">
+						<div class="modal-header">
+							<h4 class="modal-title" id="myModalLabel">Thông báo</h4>
+						</div>
+						<div class="modal-body" style="font-size: 18px;">
+							<p id="modalMessage"></p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			@RenderBody()
+		</main>
+		<div class="footer-copyright-area">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="footer-copy-right">
+							<p>Copyright © 2018 <a href="https://colorlib.com/wp/templates/">Colorlib</a> All rights reserved.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		function customSort(sortName, sortOrder, data) {
+			var order = sortOrder === 'desc' ? -1 : 1;
+			if (sortName === 'status') {
+				sortName = 'isActive';
+			}
+			data.sort(function (a, b) {
+				var aa = a[sortName];
+				var bb = b[sortName];
+				if (typeof aa === 'string' && !isNaN(aa)) {
+					aa = +aa;
+				}
+				if (typeof bb === 'string' && !isNaN(bb)) {
+					bb = +bb;
+				}
+				if (typeof aa === 'string') {
+					aa = aa.toLowerCase();
+				}
+				if (typeof bb === 'string') {
+					bb = bb.toLowerCase();
+				}
+				if (aa < bb) {
+					return order * -1;
+				}
+				if (aa > bb) {
+					return order;
+				}
+				return 0;
+			});
+		}
+	</script>
+	<!-- Kiểm tra token hết hạn để đăng xuất -->
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$.ajax({
+				url: '/thanh-vien/kiem-tra-token',
+				type: 'GET',
+				success: function (data) {
+					if (!data.valid) {
+						logout();
+					}
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log('Error calling api:', textStatus, errorThrown);
+				}
+			});
+
+		});
+		function logout() {
+			$.ajax({
+				url: '/thanh-vien/dang-xuat',
+				type: 'POST',
+				success: function (data) {
+					window.location.href = '/thanh-vien/dang-nhap';
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log('Error calling api:', textStatus, errorThrown);
+				}
+			});
+		}
+	</script>
+
+	<!-- jquery
+		============================================ -->
+	<script src="~/template/nalika/js/vendor/jquery-1.12.4.min.js"></script>
+	<!-- bootstrap JS
+		============================================ -->
+	<script src="~/template/nalika/js/bootstrap.min.js"></script>
+	<!-- wow JS
+		============================================ -->
+	<script src="~/template/nalika/js/wow.min.js"></script>
+	<!-- price-slider JS
+		============================================ -->
+	<script src="~/template/nalika/js/jquery-price-slider.js"></script>
+	<!-- meanmenu JS
+		============================================ -->
+	<script src="~/template/nalika/js/jquery.meanmenu.js"></script>
+	<!-- owl.carousel JS
+		============================================ -->
+	<script src="~/template/nalika/js/owl.carousel.min.js"></script>
+	<!-- sticky JS
+		============================================ -->
+	<script src="~/template/nalika/js/jquery.sticky.js"></script>
+	<!-- scrollUp JS
+		============================================ -->
+	<script src="~/template/nalika/js/jquery.scrollUp.min.js"></script>
+	<!-- mCustomScrollbar JS
+		============================================ -->
+	<script src="~/template/nalika/js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+	<script src="~/template/nalika/js/scrollbar/mCustomScrollbar-active.js"></script>
+	<!-- metisMenu JS
+		============================================ -->
+	<script src="~/template/nalika/js/metisMenu/metisMenu.min.js"></script>
+	<script src="~/template/nalika/js/metisMenu/metisMenu-active.js"></script>
+	<!-- morrisjs JS
+		============================================ -->
+	<script src="~/template/nalika/js/sparkline/jquery.sparkline.min.js"></script>
+	<script src="~/template/nalika/js/sparkline/jquery.charts-sparkline.js"></script>
+	<!-- calendar JS
+		============================================ -->
+	<script src="~/template/nalika/js/calendar/moment.min.js"></script>
+	<script src="~/template/nalika/js/calendar/fullcalendar.min.js"></script>
+	<script src="~/template/nalika/js/calendar/fullcalendar-active.js"></script>
+	<!-- float JS
+		============================================ -->
+	<script src="~/template/nalika/js/flot/jquery.flot.js"></script>
+	<script src="~/template/nalika/js/flot/jquery.flot.resize.js"></script>
+	<script src="~/template/nalika/js/flot/jquery.flot.pie.js"></script>
+	<script src="~/template/nalika/js/flot/jquery.flot.tooltip.min.js"></script>
+	<script src="~/template/nalika/js/flot/jquery.flot.orderBars.js"></script>
+	<script src="~/template/nalika/js/flot/curvedLines.js"></script>
+	<script src="~/template/nalika/js/flot/flot-active.js"></script>
+	<!-- plugins JS
+		============================================ -->
+	<script src="~/template/nalika/js/plugins.js"></script>
+	<!-- main JS
+		============================================ -->
+	<script src="~/template/nalika/js/main.js"></script>
+	<script src="~/template/nalika/js/datapicker/bootstrap-datepicker.js"></script>
+	<script src="~/template/nalika/js/datapicker/datepicker-active.js"></script>
+	<script src="~/template/nalika/js/colorpicker/jquery.spectrum.min.js"></script>
+	<script src="~/template/nalika/js/colorpicker/color-picker-active.js"></script>
+	<script src="~/template/nalika/js/data-table/tableExport.js"></script>
+	<script src="~/template/nalika/js/data-table/bootstrap-table-export.js"></script>
+	@await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

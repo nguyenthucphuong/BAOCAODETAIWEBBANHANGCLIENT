@@ -1,0 +1,28 @@
+﻿@model string
+@using Newtonsoft.Json
+<!-- Thông báo khi giỏ hàng vượt quá số lượng cho phép...-->
+<div class="modal" tabindex="-1" role="dialog" id="message-modal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-primary text-center">
+				<h5 class="modal-title text-white" style="font-size: 20px;">Thông báo</h5>
+			</div>
+			<div class="modal-body text-dark text-center" style="font-size: 20px;">
+				<p id="message-content"></p>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	$(document).ready(function () {
+		var message = '@Html.Raw(JsonConvert.SerializeObject(Model))';
+		if (message !== '') {
+			message = message.replace(/"/g, '');
+			$("#message-content").text(message);
+			$("#message-modal").modal('show');
+			setTimeout(function () {
+				$("#message-modal").modal('hide');
+			}, 3000);
+		}
+	});
+</script>

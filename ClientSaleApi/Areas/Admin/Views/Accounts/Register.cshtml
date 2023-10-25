@@ -1,0 +1,52 @@
+﻿@model ClientSaleApi.Models.Accounts.InputRegister
+
+@{
+	ViewData["Title"] = "Register";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAccount.cshtml";
+}
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-lg-3 col-md-3 col-sm-3 col-xs-12"></div>
+		<div class="col-md-6 col-md-6 col-sm-6 col-xs-12">
+			<div class="text-center text-white custom-login" style="color: white;">
+				<h3>Registration</h3>
+			</div>
+			<div class="hpanel">
+				<div class="panel-body" style=" background-color: #1B2A47; color: white;">
+					<form id="loginForm" asp-area="Admin" asp-controller="Accounts" asp-action="Register" method="post">
+						<div class="row">
+							<div class="form-group col-lg-12">
+								<label asp-for="Email"></label>
+								<input type="email" asp-for="Email" class="form-control" onkeyup="this.value = this.value.toLowerCase();" required />
+								<span asp-validation-for="Email" class="text-danger"></span>
+							</div>
+							<div class="form-group col-lg-12">
+								<label asp-for="UserName"></label>
+								<input type="text" asp-for="UserName" class="form-control" required />
+								<span asp-validation-for="UserName" class="text-danger"></span>
+							</div>
+							<div class="form-group col-lg-12">
+								<label asp-for="Password"></label>
+								<input asp-for="Password" class="form-control" type="password" required />
+								<span asp-validation-for="Password" class="text-danger"></span>
+							</div>
+							<div class="form-group col-lg-12">
+								<label asp-for="ConfirmPassword"></label>
+								<input asp-for="ConfirmPassword" class="form-control" type="password" minlength="6" maxlength="50" required />
+								<span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+							</div>
+						</div>
+						<div class="text-center">
+							<button type="submit" id="register" class="btn btn-success loginbtn">Register</button>
+							<button type="reset" class="btn btn-default" value="Reset">Reset</button>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-3 col-sm-3 col-xs-12"></div>
+	</div>
+</div>
+

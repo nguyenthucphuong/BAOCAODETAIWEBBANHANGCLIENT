@@ -1,0 +1,79 @@
+﻿@model ClientSaleApi.Models.ViewModels.IndexViewModel<CustomerEx>
+@using ClientSaleApi.Models.Customers;
+
+@{
+	ViewData["Title"] = "Index";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutDashboard.cshtml";
+	<partial name="_BootstrapTablePartial" />
+}
+@section Search
+	{
+	<form asp-area="Admin" asp-controller="Customers" asp-action="Index" customer="search">
+		<input type="text" placeholder="Search..." class="form-control" name="search" style="color: white;">
+		<a href="#" onclick="this.closest('form').submit()">
+			<i class="fa fa-search"></i>
+		</a>
+	</form>
+}
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+	<partial name="_MessagePartial" model="@Model.Message" />
+}
+<div class="product-status mg-b-30">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="product-status-wrap">
+					<h4>Customers List</h4>
+					<div class="add-product">
+						<a asp-area="Admin" asp-controller="Customers" asp-action="Edit">Add</a>
+					</div>
+					<table id="table" data-toggle="table" data-custom-sort="customSort">
+						@if (Model.Items != null && Model.Items.Count == 0)
+						{
+							<caption class="text-center">
+								Không có dữ liệu
+							</caption>
+						}
+						<thead class="text-center">
+							<tr>
+								<th class="text-center" data-field="stt" data-sortable="true">STT</th>
+								<th class="text-center" data-field="user" data-sortable="true">User</th>
+								<th class="text-center" data-field="name" data-sortable="true">Name</th>
+								<th class="text-center" data-field="address" data-sortable="true">Address</th>
+								<th class="text-center" data-field="ward" data-sortable="true">Ward</th>
+								<th class="text-center" data-field="district" data-sortable="true">District</th>
+								<th class="text-center" data-field="city" data-sortable="true">City</th>
+								<th class="text-center" data-field="phonenumber" data-sortable="true">PhoneNumber</th>
+								<th data-field="isActive" data-visible="false">IsActive</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (Model != null)
+							{
+								int count = (Model.Items!.PageNumber - 1) * Model.Items.PageSize + 1;
+								@foreach (var customer in Model.Items)
+								{
+									<tr>
+										<td class="text-center">@count</td>
+										<td class="text-start">@customer.UserName</td>
+										<td class="text-start">@customer.CustomerName</td>
+										<td class="text-start">@customer.Address</td>
+										<td class="text-start">@customer.Ward</td>
+										<td class="text-start">@customer.District</td>
+										<td class="text-start">@customer.City</td>
+										<td class="text-center">@customer.PhoneNumber</td>
+										<td>@customer.IsActive</td>
+									</tr>
+									count++;
+								}
+							}
+						</tbody>
+					</table>
+					<partial name="_Paging" model="@Model?.PagingModel" />
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,123 @@
+﻿@model ClientSaleApi.Models.ViewModels.Shops.OutputProduct
+@{
+	ViewData["Title"] = "Chitiet";
+	Layout = "~/Views/Shared/_LayoutMultishop.cshtml";
+}
+
+<!-- Breadcrumb Start -->
+<div class="container-fluid">
+	<div class="row px-xl-5">
+		<div class="col-12">
+			<nav class="breadcrumb bg-light mb-30">
+				<a asp-area="" asp-controller="Home" asp-action="Index" class="breadcrumb-item text-dark click-item">Home</a>
+				<a asp-area="" asp-controller="Shops" asp-action="Index" class="breadcrumb-item text-dark click-item">Shop</a>
+				<span class="breadcrumb-item active">Detail</span>
+			</nav>
+		</div>
+	</div>
+</div>
+<!-- Breadcrumb End -->
+<div id="loading" class="loading" style="display: none;"></div>
+@if (!string.IsNullOrEmpty(Model?.Message))
+{
+	<partial name="_MessageCartPartial" model="@Model?.Message" />
+}
+<!-- Shop Detail Start -->
+<div class="container-fluid pb-5">
+	<div class="row px-xl-5">
+		<div class="col-lg-5 mb-30">
+			<div id="product-carousel" class="carousel slide" data-ride="carousel">
+				<div class="carousel-inner bg-light" style="display: grid; justify-content: center; align-content: center;">
+					<div class="carousel-item active">
+						@if (!string.IsNullOrEmpty(Model?.ProductImage))
+						{
+							<img src="@Url.Content("http://localhost:5260/"+@Model?.ProductImage)" alt="Product-Image" style="height: 280px; object-fit:cover;">
+						}
+					</div>
+				</div>
+				<a class="carousel-control-prev" href="#product-carousel" data-slide="prev">
+					<i class="fa fa-2x fa-angle-left text-dark"></i>
+				</a>
+				<a class="carousel-control-next" href="#product-carousel" data-slide="next">
+					<i class="fa fa-2x fa-angle-right text-dark"></i>
+				</a>
+			</div>
+		</div>
+		<div class="col-lg-7 h-auto mb-30">
+			<div class="h-100 bg-light p-30">
+				<h3>@Model?.ProductName</h3>
+				<div class="d-flex mb-3">
+					<div class="text-primary mr-2">
+						<small class="fas fa-star"></small>
+						<small class="fas fa-star"></small>
+						<small class="fas fa-star"></small>
+						<small class="fas fa-star-half-alt"></small>
+						<small class="far fa-star"></small>
+					</div>
+					<small class="pt-1">(99 Reviews)</small>
+				</div>
+				<div class="d-flex font-weight-semi-bold mb-4">
+					@if (Model?.DiscountPrice < Model?.ProductPrice)
+					{
+						<h3>@string.Format("{0:N0}", @Model?.DiscountPrice)</h3>
+
+						<h4 class="text-muted ml-2"><del>@string.Format("{0:N0}", @Model?.ProductPrice)</del></h4>
+					}
+					else
+					{
+						<h3>@string.Format("{0:N0}", @Model?.ProductPrice)</h3>
+					}
+				</div>
+				<form asp-action="AddToCart" asp-controller="Carts" method="post">
+					<input type="hidden" name="ProductId" value="@Model?.ProductId" />
+					<input type="hidden" name="FriendlyUrl" value="@Model?.FriendlyUrl" />
+					<div class="d-flex align-items-center mb-4 pt-2">
+						<div class="input-group quantity mr-3" style="width: 130px;">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-primary btn-minus">
+									<i class="fa fa-minus"></i>
+								</button>
+							</div>
+							<input type="text" name="Quantity" class="form-control bg-secondary border-0 text-center" value="1" />
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-primary btn-plus">
+									<i class="fa fa-plus"></i>
+								</button>
+							</div>
+						</div>
+						<button type="submit" class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="row px-xl-5">
+		<div class="col">
+			<div class="bg-light p-30">
+				<div class="nav nav-tabs mb-4">
+					<a class="nav-item nav-link text-dark active" data-toggle="tab" href="#tab-pane-1">Description</a>
+				</div>
+				<div class="tab-content">
+					<div class="tab-pane fade show active" id="tab-pane-1">
+						<h4 class="mb-3">Product Description</h4>
+						<p>@Model?.ProductDes</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Shop Detail End -->
+<script>
+	$(document).ready(function () {
+		$('.click-item').on('click', function (event) {
+			new Promise(function (resolve, reject) {
+				setTimeout(resolve, 2000);
+				$('#loading').show();
+				window.location.href = url.href;
+			}).then(function () {
+				$('#loading').hide();
+			});
+		});
+	});
+</script>
