@@ -71,7 +71,14 @@
 										<td>
 											@if (!string.IsNullOrEmpty(product.ProductImage))
 											{
-												<img src="@Url.Content("http://localhost:5260/"+@product.ProductImage)" asp-append-version="true">
+												if (product.ProductImage.Contains("\\"))
+												{
+													<img src="@Url.Action("GetImage", "Products", new { path = product.ProductImage })" asp-append-version="true">
+												}
+												else
+												{
+													<img src="@Url.Content("http://localhost:5260/"+@product.ProductImage)" asp-append-version="true">
+												}
 											}
 										</td>
 										<td class="text-start">@product.CategoryName</td>

@@ -99,5 +99,19 @@ namespace ClientSaleApi.Controllers
             return View(result);
         }
 
-    }
+		[Route("lay-hinh")]
+		public async Task<Stream?> GetImage(string path)
+		{
+			string baseUrl = $"http://localhost:5260/api/Products/GetImage?path={path}";
+			var response = await _httpClient.GetAsync(baseUrl);
+			if (response.IsSuccessStatusCode)
+			{
+				var result = await response.Content.ReadAsStreamAsync();
+				return result;
+			}
+			return null;
+		}
+
+
+	}
 }

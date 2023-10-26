@@ -74,12 +74,20 @@
 												<div class="input-group mg-b-pro-edt">
 													<span class="input-group-addon"><i class="icon nalika-picture" aria-hidden="true"></i></span>
 													<input asp-for="imageFile" type="file" class="form-control">
+													@*<input asp-for="imageFile" type="file" class="form-control" multiple name="imageFile[]">*@
 												</div>
 												<input type="hidden" asp-for="ProductImage" value="@Model?.ProductImage" />
 												<td>
-													@if (!string.IsNullOrEmpty(@Model?.ProductImage))
+													@if (!string.IsNullOrEmpty(Model?.ProductImage))
 													{
-														<img src="@Url.Content("http://localhost:5260/"+@Model.ProductImage)" width="50" height="50">
+														if (Model.ProductImage.Contains("\\"))
+														{
+															<img src="@Url.Action("GetImage", "Products", new { path = Model.ProductImage })" width="50" height="50" asp-append-version="true">
+														}
+														else
+														{
+															<img src="@Url.Content("http://localhost:5260/"+@Model.ProductImage)" width="50" height="50" asp-append-version="true">
+														}
 													}
 												</td>
 											</div>

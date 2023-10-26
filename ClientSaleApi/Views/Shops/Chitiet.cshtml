@@ -31,7 +31,14 @@
 					<div class="carousel-item active">
 						@if (!string.IsNullOrEmpty(Model?.ProductImage))
 						{
-							<img src="@Url.Content("http://localhost:5260/"+@Model?.ProductImage)" alt="Product-Image" style="height: 280px; object-fit:cover;">
+							if (Model.ProductImage.Contains("\\"))
+							{
+								<img src="@Url.Action("GetImage", "Shops", new { path = Model.ProductImage })" alt="Product-Image" style="height: 280px; object-fit:cover;" asp-append-version="true">
+							}
+							else
+							{
+								<img src="@Url.Content("http://localhost:5260/"+@Model.ProductImage)" alt="Product-Image" style="height: 280px; object-fit:cover;" asp-append-version="true">
+							}
 						}
 					</div>
 				</div>

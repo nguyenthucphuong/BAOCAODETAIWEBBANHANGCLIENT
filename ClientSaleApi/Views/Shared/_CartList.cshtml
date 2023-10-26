@@ -23,7 +23,14 @@
 				<tr>
 					@if (!string.IsNullOrEmpty(item.ProductImage))
 					{
-						<td class="text-start" style="text-align: left;"><img src="@Url.Content("http://localhost:5260/"+@item.ProductImage)" alt="Product-Image" style="width: 50px;"> @item.ProductName</td>
+						if (item.ProductImage.Contains("\\"))
+						{
+							<td class="text-start" style="text-align: left;"><img src="@Url.Action("GetImage", "Shops", new { path = item.ProductImage })" alt="Product-Image" style="width: 50px;" asp-append-version="true"> @item.ProductName</td>
+						}
+						else
+						{
+							<td class="text-start" style="text-align: left;"><img src="@Url.Content("http://localhost:5260/"+@item.ProductImage)" alt="Product-Image" style="width: 50px;"> @item.ProductName</td>
+						}
 					}
 					else
 					{

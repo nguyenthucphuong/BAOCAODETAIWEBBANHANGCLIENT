@@ -105,7 +105,14 @@
 										<td>
 											@if (!string.IsNullOrEmpty(product.ProductImage))
 											{
-												<img src="@Url.Content("http://localhost:5260/"+@product.ProductImage)" alt="Product-Image" height="200" object-fit: contain;>
+												if (product.ProductImage.Contains("\\"))
+												{
+													<img src="@Url.Action("GetImage", "Shops", new { path = product.ProductImage })" alt="Product-Image" width="200" height="200" object-fit: contain;>
+												}
+												else
+												{
+													<img src="@Url.Content("http://localhost:5260/"+@product.ProductImage)" alt="Product-Image" width="200" height="200" object-fit: contain; asp-append-version="true">
+												}
 											}
 										</td>
 										<div class="text-center py-4">

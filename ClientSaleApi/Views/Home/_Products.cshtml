@@ -10,7 +10,14 @@
 				<a class="h6 productloading text-decoration-none text-truncate" asp-controller="Shops" asp-action="SelectProduct" asp-route-productId="@product.ProductId" asp-route-friendlyUrl="@product.FriendlyUrl">
 					@if (!string.IsNullOrEmpty(product.ProductImage))
 					{
-						<img src="@Url.Content("http://localhost:5260/"+@product.ProductImage)" alt="Product-Image" width="200" height="200" object-fit: contain;>
+						if (product.ProductImage.Contains("\\"))
+						{
+							<img src="@Url.Action("GetImage", "Shops", new { path = product.ProductImage })" alt="Product-Image" width="200" height="200" object-fit: contain;>
+						}
+						else
+						{
+							<img src="@Url.Content("http://localhost:5260/"+@product.ProductImage)" alt="Product-Image" width="200" height="200" object-fit: contain; asp-append-version="true">
+						}
 					}
 					<div class="text-center py-4">
 						<span class="h6 text-decoration-none text-truncate" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@product.ProductName</span>
