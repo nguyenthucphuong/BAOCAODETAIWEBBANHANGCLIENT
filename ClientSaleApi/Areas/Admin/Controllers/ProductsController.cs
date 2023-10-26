@@ -20,8 +20,6 @@ namespace ClientSaleApi.Areas.Admin.Controllers
             _httpClient = httpClientFactory.CreateClient("Client");
         }
 
-
-
         [Route("danh-sach")]
         public async Task<IActionResult> Index(SearchViewModel searchModel, int? page, string? message)
         {

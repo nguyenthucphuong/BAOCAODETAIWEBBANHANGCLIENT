@@ -415,7 +415,7 @@
 	var nextHour = currentHour + 1;
 
 	// Nếu giờ tiếp theo lớn hơn 20, đặt nó thành 8 và tăng ngày lên 1
-	if (nextHour > 20) {
+	if (nextHour >= 20) {
 		nextHour = 8;
 		var tomorrow = new Date(today);
 		tomorrow.setDate(tomorrow.getDate() + 1);
