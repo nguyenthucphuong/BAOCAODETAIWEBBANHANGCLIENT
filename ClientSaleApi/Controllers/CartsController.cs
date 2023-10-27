@@ -1,10 +1,12 @@
-﻿using ClientSaleApi.Areas.Admin.Controllers;
+﻿using Braintree;
+using ClientSaleApi.Areas.Admin.Controllers;
 using ClientSaleApi.Models.Carts;
 using ClientSaleApi.Models.Customers;
 using ClientSaleApi.Models.OrderItems;
 using ClientSaleApi.Models.Orders;
 using ClientSaleApi.Models.Payments;
 using ClientSaleApi.Models.Promotions;
+using ClientSaleApi.Models.Services;
 using ClientSaleApi.Models.Users;
 using ClientSaleApi.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -21,9 +23,12 @@ namespace ClientSaleApi.Controllers
 	public class CartsController : BaseController<CartEx, ListViewModel<CartEx>, InputCart>
 	{
 		private readonly HttpClient _httpClient;
-		public CartsController(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
+		private readonly IBraintreeService _braintreeService;
+
+		public CartsController(IHttpClientFactory httpClientFactory, IBraintreeService braintreeService) : base(httpClientFactory)
 		{
 			_httpClient = httpClientFactory.CreateClient("Client");
+			_braintreeService = braintreeService;
 		}
 
 		[Route("xem-gio-hang")]
@@ -44,7 +49,6 @@ namespace ClientSaleApi.Controllers
 
 			return View(cart);
 		}
-
 
 		[HttpPost]
 		[Route("them-gio-hang")]
@@ -159,8 +163,70 @@ namespace ClientSaleApi.Controllers
 			{
 				return BadRequest("Lỗi không thể lấy thông tin khách hàng!");
 			}
-
+			// Tạo token Braintree
+			var gateway = _braintreeService.GetGateway();
+			checkoutModel.ClientToken = gateway.ClientToken.Generate();
 			return View(checkoutModel);
+		}
+
+		[Route("pay-braintree")]
+		public ActionResult PayBraintree(System.Decimal amount, string nonce, string customerName, string phoneNumber)
+		{
+			var gateway = _braintreeService.GetGateway();
+
+			// Tạo thông tin khách hàng
+			var customerRequest = new CustomerRequest
+			{
+				FirstName = customerName,
+				Phone = phoneNumber
+			};
+			Result<Customer> customerResult = gateway.Customer.Create(customerRequest);
+
+			if (!customerResult.IsSuccess())
+			{
+				return Json(new { isSuccess = false, message = "Không thể tạo thông tin khách hàng" });
+			}
+
+			// Tạo phương thức thanh toán cho khách hàng
+			var paymentMethodRequest = new PaymentMethodRequest
+			{
+				CustomerId = customerResult.Target.Id,
+				PaymentMethodNonce = nonce
+			};
+			Result<PaymentMethod> paymentMethodResult = gateway.PaymentMethod.Create(paymentMethodRequest);
+
+			if (!paymentMethodResult.IsSuccess())
+			{
+				return Json(new { isSuccess = false, message = "Không thể tạo phương thức thanh toán" });
+			}
+
+			// Sử dụng token từ kết quả để tạo giao dịch
+			var request = new TransactionRequest
+			{
+				Amount = amount,
+				PaymentMethodToken = paymentMethodResult.Target.Token,
+				Options = new TransactionOptionsRequest { SubmitForSettlement = true }
+			};
+
+			Result<Transaction> result = gateway.Transaction.Sale(request);
+			if (result.IsSuccess())
+			{
+				Transaction transaction = result.Target;
+				return Json(new { isSuccess = true, message = transaction.Id });
+			}
+			else if (result.Transaction != null)
+			{
+				return Json(new { isSuccess = true, message = result.Transaction.Id });
+			}
+			else
+			{
+				string errorMessages = "";
+				foreach (ValidationError error in result.Errors.DeepAll())
+				{
+					errorMessages += "Error: " + (int)error.Code + " - " + error.Message + "\n";
+				}
+				return Json(new { isSuccess = false, message = errorMessages });
+			}
 		}
 
 		[HttpPost]

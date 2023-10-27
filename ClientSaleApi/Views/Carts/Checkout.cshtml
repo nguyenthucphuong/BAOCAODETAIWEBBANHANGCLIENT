@@ -4,6 +4,10 @@
 	Layout = "~/Views/Shared/_LayoutMultishop.cshtml";
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	//Braintree
+	<script src="https://js.braintreegateway.com/web/dropin/1.40.2/js/dropin.min.js"></script>
+	<script src="/App_Themes/javascript/demo.js"></script>
+
 	long subTotal = 0;
 	long subTotalDiscount = 0;
 	long toTal = 0;
@@ -223,8 +227,9 @@
 		</div>
 	</div>
 </form>
-<!-- Checkout End -->
-<!-- Modal Coupon-->
+
+<!-- Modal thông báo cho thanh toán tiền mặt hoặc chuyển khoản ngân hàng -->
+<!-- Modal thông báo mã Coupon-->
 <div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -243,7 +248,7 @@
 	</div>
 </div>
 
-<!-- Modal Confirm-->
+<!-- Modal thông báo xác nhận thông tin thanh toán-->
 <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -259,6 +264,72 @@
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
 				<button type="button" class="btn btn-primary" id="confirmOrder" onclick="document.getElementById('submitOrderButton').click();">Xác nhận</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--------------------- Modal thông báo cho thanh toán  Braintree --------------------->
+<!-- Modal thông báo mã giao dịch Braintree -->
+<div class="modal fade" id="codeBraintree" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-warning bg-opacity-50">
+				<h5 class="modal-title text-white" id="couponModalLabel">Thông báo</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body text-dark">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary bg-warning" data-dismiss="modal" onclick="document.getElementById('submitOrderButton').click();">Đóng</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal thông báo xác nhận thông tin trước khi thanh toán Braintree -->
+<div class="modal fade" id="confirmBraintreeModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="staticBackdropLabel">Xác nhận hoàn tất đơn hàng</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				Bạn chắc chắn đã kiểm tra thông tin đơn hàng chính xác?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+				<button type="button" class="btn btn-primary" id="confirmBraintree">Xác nhận</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal thanh toán Braintree -->
+<div class="modal fade" id="brainTree" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="staticBackdropLabel">Thanh toán Braintree</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="bt-drop-in-wrapper">
+					<div id="bt-dropin"></div>
+				</div>
+				<input id="nonce" name="payment_method_nonce" type="hidden" />
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+				<button id="confirmBrainTree" type="button" class="btn btn-primary">Xác nhận</button>
 			</div>
 		</div>
 	</div>
@@ -454,5 +525,66 @@
 		}
 		return number + ""; // always return a string
 	}
+
+	// <----------------- Braintree ----------------->
+
+	var client_token = "@Model?.ClientToken";
+	var radio = document.querySelector('#tindung');
+
+	// Tạo sự kiện khi radio được chọn
+	radio.addEventListener('change', function () {
+		if (this.checked) {
+			braintree.dropin.create({
+				authorization: client_token,
+				container: '#bt-dropin',
+				paypal: { flow: 'vault' }
+			}, function (createErr, instance) {
+				// Mở modal #staticBackdrop khi radio được chọn
+				$('#confirmBraintreeModal').modal('show');
+				$('#confirmBraintree').on('click', function () {
+					$('#confirmBraintreeModal').modal('hide');
+				});
+
+				// Khi modal #confirmBraintreeModal hoàn toàn ẩn đi
+				$('#confirmBraintreeModal').on('hidden.bs.modal', function () {
+					// Lấy thông tin khách hàng từ các trường nhập liệu
+					var customerName = $('input[name="InputCustomer.CustomerName"]').val();
+					var phoneNumber = $('input[name="InputCustomer.PhoneNumber"]').val();
+
+					// Mở modal #myModal
+					$('#brainTree').modal('show');
+
+					// Thêm sự kiện khi nhấn nút Xác nhận thanh toán BrainTree trên modal
+					$('#confirmBrainTree').on('click', function () {
+						var total = parseFloat(document.getElementById('total').innerText.replace(/,/g, ''));
+						var totalCoupon = parseFloat(document.getElementById('totalcoupon').innerText.replace(/,/g, ''));
+						var amount = totalCoupon < total ? totalCoupon : total;
+
+						instance.requestPaymentMethod(function (err, payload) {
+							if (err) {
+								console.log('Error', err);
+								return;
+							}
+							$.ajax({
+								url: '/gio-hang/pay-braintree',
+								method: 'GET',
+								data: { amount: amount, nonce: payload.nonce, customerName: customerName, phoneNumber: phoneNumber },
+								success: function (response) {
+									$('#codeBraintree .modal-body').html(`Chuyển tiền Braintree thành công! Mã giao dịch: <strong>${response.message.toUpperCase()}</strong>`);
+									$('#codeBraintree').modal('show');
+									if (response.isSuccess) {
+										$('#submitOrderButton').submit();
+									}
+								}
+							}).always(function () {
+								// Tắt modal khi AJAX hoàn tất
+								$('#brainTree').modal('hide');
+							});
+						});
+					});
+				});
+			});
+		}
+	});
 
 </script>

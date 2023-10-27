@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ClientSaleApi.Models.Authentication;
+using ClientSaleApi.Models.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,8 @@ builder.Services.AddHttpClient("Client")
 		.AddHttpMessageHandler<AuthorizationHeaderHandler>();
 builder.Services.AddTransient<AuthorizationHeaderHandler>();
 
+// Đăng ký IBraintree
+builder.Services.AddTransient<IBraintreeService, BraintreeService>();
 
 builder.Services.AddAuthentication(options =>
 {
